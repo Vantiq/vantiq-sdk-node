@@ -1,5 +1,7 @@
 <div style="height: 50px"><img style="float:right" alt="VantIQ Logo" src="http://vantiq.com/wp-content/uploads/2015/12/vantiq.png"/></div>
 
+[![Build Status](https://travis-ci.com/Vantiq/vantiq-sdk-node.svg?token=jUrpVsQpcEipBxV7WZED&branch=master)](https://travis-ci.com/Vantiq/vantiq-sdk-node)
+
 # VantIQ Node.JS SDK
 
 The [VantIQ](http://www.vantiq.com) NodeJS SDK is a [NodeJS](http://nodejs.org) module written in JavaScript that provides an API into a VantIQ system.  The VantIQ system may be in the cloud or deployed in an organizations internal or [IoT](http://en.wikipedia.org/wiki/Internet_of_Things) environment.  The SDK connects to the VantIQ servers using the [VantIQ REST API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).
