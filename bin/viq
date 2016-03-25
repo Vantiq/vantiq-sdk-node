@@ -1,0 +1,171 @@
+#!/usr/bin/env node
+
+//
+// Command Line Interface Application for VantIQ SDK
+//
+var fs     = require('fs');
+var vorpal = require('vorpal')();
+var VIQ    = require('../index');
+
+//
+// Instance of the SDK
+//
+var v = null;
+
+//
+// Function that first checks to see if the CLI has connected
+// to the server.  If not, then issue a warning, else run
+// the action handler.
+//
+function ensureConnected(action) {
+    return function(args, cb) {
+        if(v && v.isAuthenticated()) { 
+            action.bind(this)(args, cb);
+        } else {
+            this.log("Please connect to the server before issuing requests to the server.");
+            cb();
+        }
+    };
+}
+
+//
+// Commands
+//
+vorpal
+    .command('connect <server> <username> <password>')
+    .description('Connects to the specified server with the given credentials.  If no arguments specified, looks in the CLI command line')
+    .action(function(args, cb) {
+        v = new VIQ({
+            server: args.server,
+            apiVersion: 1,
+        });
+        v.authenticate(args.username, args.password)
+            .then(()     => { this.log("Connection succeeded with " + args.server);   cb(); })
+            .catch((err) => { this.log(err); cb(); });
+    });
+
+vorpal
+    .command('select <type> [props] [where] [sort]')
+    .description('Selects data for a given type with optional constraints in JSON form')
+    .action(ensureConnected(function(args, cb) {
+        var where = eval("where = " + args.where);
+        var props = eval("where = " + args.props);
+        var sort = eval("where = " + args.sort);
+        v.select(args.type, props, where, sort)
+            .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
+            .catch((err)   => { this.log(err);                             cb(); });
+    }));
+
+vorpal
+    .command('count <type> [where]')
+    .description('Counts the number of records for a given type with where clause in JSON form')
+    .action(ensureConnected(function(args, cb) {
+        var where = eval("where = " + args.where);
+        v.count(args.type, where)
+            .then((result) => { this.log(result); cb(); })
+            .catch((err)   => { this.log(err);    cb(); });
+    }));
+
+vorpal
+    .command('insert <type> <file>')
+    .description('Inserts one or more records into the given type using the given JSON file')
+    .action(ensureConnected(function(args, cb) {
+        fs.readFile(args.file, 'utf8', (err, data) => {
+            if(err) {
+                this.log(err);
+                cb();
+            } else {
+                v.insert(args.type, JSON.parse(data))
+                    .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
+                    .catch((err)   => { this.log(err);                             cb(); });                
+            }
+        });
+    }));
+
+vorpal
+    .command('update <type> <key> <file>')
+    .description('Updates the given record identified by the key for the given type using the given JSON file')
+    .action(ensureConnected(function(args, cb) {
+        fs.readFile(args.file, 'utf8', (err, data) => {
+            if(err) {
+                this.log(err);
+                cb();
+            } else {
+                v.update(args.type, args.key, JSON.parse(data))
+                    .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
+                    .catch((err)   => { this.log(err);                             cb(); });                
+            }
+        });
+    }));
+
+vorpal
+    .command('upsert <type> <file>')
+    .description('Inserts or updates the given record for the given type using the given JSON file')
+    .action(ensureConnected(function(args, cb) {
+        fs.readFile(args.file, 'utf8', (err, data) => {
+            if(err) {
+                this.log(err);
+                cb();
+            } else {
+                v.upsert(args.type, JSON.parse(data))
+                    .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
+                    .catch((err)   => { this.log(err);                             cb(); });                
+            }
+        });
+    }));
+
+vorpal
+    .command('delete <type> <where>')
+    .description('Deletes one or more records identified by the given constraint')
+    .action(ensureConnected(function(args, cb) {
+        var where = eval("where = " + args.where);        
+        v.delete(args.type, where)
+            .then((result) => { this.log('Delete succeeded.'); cb(); })
+            .catch((err)   => { this.log(err);                 cb(); });
+    }));
+
+vorpal
+    .command('publish <topic> <file>')
+    .description('Publishes a message in the given file onto the given topic')
+    .action(ensureConnected(function(args, cb) {
+        fs.readFile(args.file, 'utf8', (err, data) => {
+            if(err) {
+                this.log(err);
+                cb();
+            } else {
+                v.publish(args.topic, JSON.parse(data))
+                    .then((result) => { this.log('Publish succeeded.'); cb(); })
+                    .catch((err)   => { this.log(err);                  cb(); });                
+            }
+        });
+    }));
+
+
+vorpal
+    .command('execute <procedure> [params]')
+    .description('Executes the named procedure with optional arguments contained in a JSON file')
+    .action(ensureConnected(function(args, cb) {
+        var params = (args.params ? eval("params = " + args.params) : []);
+        return v.execute(args.procedure, params)
+            .then((result) => { 
+                this.log(JSON.stringify(result, null, 2)); 
+                cb(); 
+            })
+            .catch((err) => { 
+                this.log(err);
+                cb(); 
+            });
+
+    }));
+
+//
+// Start the command line.  If a command was present on the CLI command
+// line, it will be executed.
+//
+var pkgInfo = require('../package.json');
+
+vorpal
+    .log('VantIQ NodeJS SDK v' + pkgInfo.version)
+    .delimiter('> ')
+    .parse(process.argv)
+    .show();
