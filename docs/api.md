@@ -377,7 +377,7 @@ take parameters (i.e. arguments) and produce a result.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-topic | String | Yes | The topic on which to publish.
+procedure | String | Yes | The procedure to execute.
 params | Object | No | An object that holds the parameters.
 
 The parameters may be provided as an array where the arguments are given in order.
