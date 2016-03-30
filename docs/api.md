@@ -1,98 +1,101 @@
 # API Reference
 
-The VIQ API provide an API for interacting with the VantIQ server.  Each
+The Vantiq API provide an API for interacting with the Vantiq server.  Each
 API returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) that provides the results or errors from the API call.
 
-This document defines the VantIQ Client SDK.  Please refer to the [VantIQ Reference Guides](https://dev.vantiq.com/docs/api/developer.html) for details on the how to use the VantIQ system.
+This document defines the Vantiq Client SDK.  Please refer to the [Vantiq Reference Guides](https://dev.vantiq.com/docs/api/developer.html) for details on the how to use the Vantiq system.
 
-## VIQ API
+## Vantiq API
 
-The VIQ object provides the main API for the VantIQ NodeJS SDK.
+The Vantiq object provides the main API for the Vantiq NodeJS SDK.
 
 ### API
 
-* [VIQ](#viq)
-* [authenticate](#viq-authenticate)
-* [select](#viq-select)
-* [count](#viq-count)
-* [insert](#viq-insert)
-* [update](#viq-update)
-* [upsert](#viq-upsert)
-* [delete](#viq-delete)
-* [publish](#viq-publish)
-* [execute](#viq-execute)
+* [Vantiq](#vantiq)
+* [Vantiq.authenticate](#vantiq-authenticate)
+* [Vantiq.select](#vantiq-select)
+* [Vantiq.count](#vantiq-count)
+* [Vantiq.insert](#vantiq-insert)
+* [Vantiq.update](#vantiq-update)
+* [Vantiq.upsert](#vantiq-upsert)
+* [Vantiq.delete](#vantiq-delete)
+* [Vantiq.publish](#vantiq-publish)
+* [Vantiq.execute](#vantiq-execute)
 
-## <a id="viq"></a> VIQ
+### Error
 
-The `VIQ` constructor creates a new instance of the `VIQ` SDK object.
+* [Error](#error)
+
+## <a id="vantiq"></a> Vantiq
+
+The `Vantiq` constructor creates a new instance of the `Vantiq` SDK object.
 The SDK expects that the first operation is to authenticate onto the
-specified VantIQ server.  After successfully authenticated, the client
-is free to issue any requests to the VantIQ server.
+specified Vantiq server.  After successfully authenticated, the client
+is free to issue any requests to the Vantiq server.
 
-`VIQ` uses the [VantIQ RESTful API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).
+`Vantiq` uses the [Vantiq RESTful API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).
 
-The `VIQ` class is provided by the `vantiq-sdk` NPM module.
+The `Vantiq` class is provided by the `vantiq-sdk` NPM module.
 
 ### Signature
 
-    var v = new VIQ(options)
+    var vantiq = new Vantiq(options)
 
 ### Option Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-server | String | Yes | The VantIQ server URL to connect to, e.g. `https://dev.vantiq.com`
+server | String | Yes | The Vantiq server URL to connect to, e.g. `https://dev.vantiq.com`
 apiVersion | Integer | No | The version of the API to use.  Defaults to the latest.
 
 ### Returns
 
-An instance of the `VIQ` object
+An instance of the `Vantiq` object
 
 ### Example
 
-    var VIQ = require('vantiq-sdk');
+    var Vantiq = require('vantiq-sdk');
     
-    var v = new VIQ({ server: 'https://dev.vantiq.com' });
+    var vantiq = new Vantiq({ server: 'https://dev.vantiq.com' });
 
-## <a id="viq-authenticate"></a> VIQ.authenticate
+## <a id="vantiq-authenticate"></a> Vantiq.authenticate
 
-The `authenticate` method connects to the VantIQ server with the given 
+The `authenticate` method connects to the Vantiq server with the given 
 authentication credentials used to authorize the user.  Upon success,
 an access token is provided to the client for use in subsequent API 
-calls to the VantIQ server.  The username and password credentials
+calls to the Vantiq server.  The username and password credentials
 are not stored.
 
 ### Signature
 
-    var promise = v.authenticate(username, password)
+    var promise = vantiq.authenticate(username, password)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-username | String | Yes | The username to provide access to the VantIQ server
-password | String | Yes | The password to provide access to the VantIQ server
+username | String | Yes | The username to provide access to the Vantiq server
+password | String | Yes | The password to provide access to the Vantiq server
 
 ### Returns
 
-The `authenticate` method returns a promise that resolves if the authentication was successful.  Upon any failure, including invalid credentials, the promise is rejected
-with the error.
+The `authenticate` method returns a promise that resolves if the authentication was successful.  Upon any failure, including invalid credentials, the promise is rejected with an [error](#error).  If the credentials are not valid, the promise rejects with an error that has a HTTP status code of *401*.
 
 ### Example
 
-    var p = v.authenticate('joe@user', 'my-secr3t-passw0rd!#!')
+    var promise = vantiq.authenticate('joe@user', 'my-secr3t-passw0rd!#!')
                 .then((result) => console.log('Authenticated!'))
                 .catch((err)   => console.error(err));
 
-## <a id="viq-select"></a> VIQ.select
+## <a id="vantiq-select"></a> Vantiq.select
 
 The `select` method issues a query to select all matching records for a given 
 type.  The `select` may query both user-defined types as well as system types, 
-such as `procedures` and `types` (see `VIQ.SYSTEM_TYPES`).
+such as `procedures` and `types` (see `Vantiq.SYSTEM_TYPES`).
 
 ### Signature
 
-    var promise = v.select(type, props, where, sort)
+    var promise = vantiq.select(type, props, where, sort)
 
 ### Parameters
 
@@ -113,41 +116,41 @@ values indicate ascending (1) or descending (-1).
 ### Returns
 
 The `select` method returns a promise that resolves to the list of matching 
-records.  Upon any failure, the promise is rejected with the error.
+records.  Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
 Select the `name` property for all available types.
 
-    v.select('types', [ 'name' ])
+    vantiq.select('types', [ 'name' ])
         .then((result) => {
             result.forEach(e => console.log(e.name);
         });
 
 Selects all properties filtering to only return types with the `TestType` name.
 
-    v.select('types', [], { name: 'TestType' })
+    vantiq.select('types', [], { name: 'TestType' })
         .then((result) => {
             console.log(JSON.stringify(result[0], null, 2));
         });
 
 Selects all records for the `TestType` type returning only the `key` and `value` properties and sorting the results by the `key` in descending order.
 
-    v.select('TestType', [ 'key', 'value' ], {}, { key: -1 })
+    vantiq.select('TestType', [ 'key', 'value' ], {}, { key: -1 })
         .then((result) => {
             console.log(JSON.stringify(result[0], null, 2));
         });
 
-## <a id="viq-count"></a> VIQ.count
+## <a id="vantiq-count"></a> Vantiq.count
 
 The `count` method is similar to the `select` method except it returns only the
 number of records rather than returning the records themselves.  The `count` may
 query both user-defined types as well as system types, such as `procedures` and
-`types` (see `VIQ.SYSTEM_TYPES`).
+`types` (see `Vantiq.SYSTEM_TYPES`).
 
 ### Signature
 
-    var promise = v.count(type, where)
+    var promise = vantiq.count(type, where)
 
 ### Parameters
 
@@ -161,31 +164,31 @@ The `where` is an object with supported operations defined in [API operations](h
 ### Returns
 
 The `count` method returns a promise that resolves to the number of matching 
-records.  Upon any failure, the promise is rejected with the error.
+records.  Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
 Counts the number of `TestType` records.
 
-    v.count('TestType')
+    vantiq.count('TestType')
         .then((result) => {
             console.log("TestType has " + result + " records");
         });
 
 Counts the number of `TestType` with a `value` greater than 10.
 
-    v.count('TestType', { value: { $gt: 10 }})
+    vantiq.count('TestType', { value: { $gt: 10 }})
         .then((result) => {
             console.log("TestType has " + result + " records with value > 10");
         });
 
-## <a id="viq-insert"></a> VIQ.insert
+## <a id="vantiq-insert"></a> Vantiq.insert
 
 The `insert` method creates a new record of a given type.
 
 ### Signature
 
-    var promise = v.insert(type, object)
+    var promise = vantiq.insert(type, object)
 
 ### Parameters
 
@@ -197,7 +200,7 @@ object | Object | Yes | The object to insert
 ### Returns
 
 The `insert` method returns a promise that resolves to the object just inserted.  
-Upon any failure, the promise is rejected with the error.
+Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
@@ -208,12 +211,12 @@ Inserts an object of type `TestType`.
         value: 42
     };
     
-    v.insert('TestType', objToInsert)
+    vantiq.insert('TestType', objToInsert)
         .then((result) => {
             console.log(JSON.stringify(result, null, 2));
         });
 
-## <a id="viq-update"></a> VIQ.update
+## <a id="vantiq-update"></a> Vantiq.update
 
 The `update` method updates an existing record of a given type.  This method
 supports partial updates meaning that only the properties provided are updated.
@@ -221,7 +224,7 @@ Any properties not specified are not changed in the underlying record.
 
 ### Signature
 
-    var promise = v.update(type, id, object)
+    var promise = vantiq.update(type, id, object)
 
 ### Parameters
 
@@ -234,7 +237,7 @@ props | Object | Yes | The properties to update in the record
 ### Returns
 
 The `update` method returns a promise that resolves to the object just updated.  
-Upon any failure, the promise is rejected with the error.
+Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
@@ -246,12 +249,12 @@ Updates a given `TestType` record
         value: 13
     };
     
-    v.update('TestType', _id, propsToUpdate)
+    vantiq.update('TestType', _id, propsToUpdate)
         .then((result) => {
             console.log(JSON.stringify(result, null, 2));
         });
 
-## <a id="viq-upsert"></a> VIQ.upsert
+## <a id="vantiq-upsert"></a> Vantiq.upsert
 
 The `upsert` method either creates or updates a record in the database depending
 if the record already exists.  The method tests for existence by looking at the
@@ -259,7 +262,7 @@ natural keys defined on the type.
 
 ### Signature
 
-    var promise = v.upsert(type, object)
+    var promise = vantiq.upsert(type, object)
 
 ### Parameters
 
@@ -271,7 +274,7 @@ object | Object | Yes | The object to upsert
 ### Returns
 
 The `upsert` method returns a promise that resolves to the object just inserted
-or created.  Upon any failure, the promise is rejected with the error.
+or created.  Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
@@ -282,19 +285,19 @@ Inserts an object of type `TestType`.
         value: 42
     };
     
-    v.upsert('TestType', objToUpsert)
+    vantiq.upsert('TestType', objToUpsert)
         .then((result) => {
             console.log(JSON.stringify(result, null, 2));
         });
 
-## <a id="viq-delete"></a> VIQ.delete
+## <a id="vantiq-delete"></a> Vantiq.delete
 
 The `delete` method removes records from the system for a given type.  Deletes always
 require a constraint indicating which records to remove.
 
 ### Signature
 
-    var promise = v.delete(type, where)
+    var promise = vantiq.delete(type, where)
 
 ### Parameters
 
@@ -308,25 +311,25 @@ The `where` is an object with supported operations defined in [API operations](h
 ### Returns
 
 The `remove` method returns a promise that resolves when the removal succeeded.  
-Upon any failure, the promise is rejected with the error.
+Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
 Removes the record with the given key.
 
-    v.delete('TestType', { key: 'SomeKey' })
+    vantiq.delete('TestType', { key: 'SomeKey' })
         .then((result) => {
             console.log("Removed record with 'SomeKey' key.");
         });
 
 Removes all records of `TestType` with a `value` greater than 10.
 
-    v.delete('TestType', { value: { $gt: 10 }})
+    vantiq.delete('TestType', { value: { $gt: 10 }})
         .then((result) => {
             console.log("Removed all records with value > 10");
         });
 
-## <a id="viq-publish"></a> VIQ.publish
+## <a id="vantiq-publish"></a> Vantiq.publish
 
 The `publish` method publishes a message onto a given topic.  Messages published
 onto topics can trigger rules to facilitate identifying situations.
@@ -336,7 +339,7 @@ topics begin with `/type`, `/property`, `/system`, and `/source`.
 
 ### Signature
 
-    var promise = v.publish(topic, message)
+    var promise = vantiq.publish(topic, message)
 
 ### Parameters
 
@@ -349,7 +352,7 @@ message | Object | Yes | The message to publish
 
 The `publish` method returns a promise that resolves when the message
 has been published successfully.  Upon any failure, the promise is rejected with 
-the error.
+an [error](#error).
 
 ### Example
 
@@ -359,19 +362,19 @@ the error.
         value: 13
     };
     
-    v.publish('/test/topic', message)
+    vantiq.publish('/test/topic', message)
         .then((result) => {
             console.log("Published message successfully.");
         });
 
-## <a id="viq-execute"></a> VIQ.execute
+## <a id="vantiq-execute"></a> Vantiq.execute
 
-The `execute` method executes a procedure on the VantIQ server.  Procedures can
+The `execute` method executes a procedure on the Vantiq server.  Procedures can
 take parameters (i.e. arguments) and produce a result.
 
 ### Signature
 
-    var promise = v.execute(procedure, params)
+    var promise = vantiq.execute(procedure, params)
 
 ### Parameters
 
@@ -387,20 +390,71 @@ are named.
 ### Returns
 
 The `execute` method returns a promise that resolves to the returned value from
-the procedure.  Upon any failure, the promise is rejected with the error.
+the procedure.  Upon any failure, the promise is rejected with an [error](#error).
 
 ### Example
 
 Executes an `sum` procedure that takes `arg1` and `arg2` arguments and returns the total using positional arguments.
 
-    v.execute('sum', [ 1, 2 ])
+    vantiq.execute('sum', [ 1, 2 ])
         .then((result) => {
             console.log("The sum of 1 + 2 = " + result.total);
         });
 
 Using named arguments.
 
-    v.execute('sum', { arg1: 1, arg2: 2 })
+    vantiq.execute('sum', { arg1: 1, arg2: 2 })
         .then((result) => {
             console.log("The sum of 1 + 2 = " + result.total);
         });
+
+# <a id="error"></a> Error
+
+The REST API provides both an HTTP status code and an error object which is returned through the SDK when an error is encountered.  The SDK returns errors in the following form:
+
+    {
+        statusCode: <HTTPStatusCode>,
+        body: [
+            {
+                code: <ErrorIdentifier>,
+                message: <ErrorMessage>,
+                params: [ <ErrorParameter>, ... ]
+            },
+            ...
+        ]
+    }
+
+### Parameters
+
+Name | Type | Description
+:--: | :--: | -----------
+statusCode | Number | The [HTTP status code](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) in the response.
+body | Array\<Object\> | The array of all errors that occurred during the SDK REST call.
+body.code | String | The Vantiq error id (e.g. _"io.vantiq.authentication.failed"_)
+body.message | String | The human readable message associated with the error
+body.params | Array\<Object\> | An array of arguments associated with the error
+
+### Example
+
+To catch if the user was not authorized using the HTTP status code.
+
+    vantiq.authenticate('joe@user', 'my-secr3t-passw0rd!#!')
+            .catch((err)   => {
+                if(err.statusCode == 401) {
+                    console.log('User not authorized');
+                } else {
+                    console.error(err)
+                }
+            });
+
+To catch if a select against an unknown type.
+
+    vantiq.select('BadType')
+            .catch((err)   => {
+                if(err.code === 'com.accessg2.ag2rs.type.not.found') {
+                    console.log('Invalid type: ' + err.params[0]);
+                } else {
+                    console.error(err)
+                }
+            });
+

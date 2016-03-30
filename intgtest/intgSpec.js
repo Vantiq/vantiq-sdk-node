@@ -1,5 +1,5 @@
 //
-// Integration Tests for NodeJS VantIQ SDK
+// Integration Tests for NodeJS Vantiq SDK
 //
 // Note: Please read README.md to understand project pre-requisites
 //       for this test.
@@ -7,16 +7,16 @@
 // Assumes the following are set as environment variables for 
 // this test:
 //
-//   SERVER:   VantIQ server URL (e.g. http://localhost:8080)
-//   USERNAME: VantIQ username for the namespace with project artifacts
-//   PASSWORD: VantIQ password
+//   SERVER:   Vantiq server URL (e.g. http://localhost:8080)
+//   USERNAME: Vantiq username for the namespace with project artifacts
+//   PASSWORD: Vantiq password
 //
 // E.g.
 //
 // % env SERVER=... USERNAME=... PASSWORD=... mocha intgSpec.js
 //
 
-var VIQ        = require('../lib/sdk');
+var Vantiq     = require('../lib/sdk');
 var chai       = require('chai');
 chai.use(require('chai-as-promised'));
 chai.use(require('chai-things'));
@@ -27,20 +27,20 @@ var USERNAME = process.env.USERNAME;
 var PASSWORD = process.env.PASSWORD;
 
 if(!SERVER || !USERNAME || !PASSWORD) {
-    if(!SERVER)   console.error("VantIQ server URL not specified in SERVER environment variable");
-    if(!USERNAME) console.error("VantIQ username not specified in USERNAME environment variable");
-    if(!PASSWORD) console.error("VantIQ password not specified in PASSWORD environment variable");
+    if(!SERVER)   console.error("Vantiq server URL not specified in SERVER environment variable");
+    if(!USERNAME) console.error("Vantiq username not specified in USERNAME environment variable");
+    if(!PASSWORD) console.error("Vantiq password not specified in PASSWORD environment variable");
     process.exit(1);
 }
 
 //
 // Tests
 //
-describe('VantIQ SDK Integration Tests', function() {
+describe('Vantiq SDK Integration Tests', function() {
 
     var v;
     before(function() {
-        v = new VIQ({ server: SERVER, apiVersion: 1 });
+        v = new Vantiq({ server: SERVER, apiVersion: 1 });
         return v.authenticate(USERNAME, PASSWORD);
     });
 

@@ -1,11 +1,11 @@
 //
-// Tests the underlying VIQSession support
+// Tests the underlying VantiqSession support
 //
-var VIQSession = require('../lib/session');
-var nock       = require('nock');
-var chai       = require('chai');
+var VantiqSession = require('../lib/session');
+var nock          = require('nock');
+var chai          = require('chai');
 chai.use(require('chai-as-promised'));
-var should     = chai.should();
+var should        = chai.should();
 
 //
 // Test configuration
@@ -24,13 +24,13 @@ var PASSWORD    = 'no-one-will-guess';
 //
 // Tests
 //
-describe('VIQSession', function() {
+describe('VantiqSession API', function() {
 
     describe('Connection and Authentication', function() {
 
         var v;
         beforeEach(function() {
-            v = new VIQSession(OPTS);
+            v = new VantiqSession(OPTS);
         });
 
         it('can authenticate successfully', function() {
@@ -107,19 +107,19 @@ describe('VIQSession', function() {
                 });
         }
 
-        it('VIQSession.get can prevent unauthorized tests', function() {
+        it('VantiqSession.get can prevent unauthorized tests', function() {
             return authCheck(v.get('/resources/types'));
         });
 
-        it('VIQSession.put can prevent unauthorized tests', function() {
+        it('VantiqSession.put can prevent unauthorized tests', function() {
             return authCheck(v.put('/resources/types'));
         });
 
-        it('VIQSession.post can prevent unauthorized tests', function() {
+        it('VantiqSession.post can prevent unauthorized tests', function() {
             return authCheck(v.post('/resources/types'));
         });
 
-        it('VIQSession.delete can prevent unauthorized tests', function() {
+        it('VantiqSession.delete can prevent unauthorized tests', function() {
             return authCheck(v.delete('/resources/types'));
         });
 
@@ -133,7 +133,7 @@ describe('VIQSession', function() {
             n = nock(SERVER_URL)
                 .get('/authenticate')
                 .reply(200, { accessToken: TOKEN });
-            v = new VIQSession(OPTS);
+            v = new VantiqSession(OPTS);
             p = v.authenticate(USERNAME, PASSWORD);
         });
 

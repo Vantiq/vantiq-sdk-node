@@ -1,7 +1,7 @@
 {
   "name": "vantiq-sdk-node",
   "version": "0.5.0",
-  "description": "VantIQ NodeJS SDK",
+  "description": "Vantiq NodeJS SDK",
   "main": "index.js",
   "directories": {
     "bin": "bin", 

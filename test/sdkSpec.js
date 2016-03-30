@@ -1,7 +1,7 @@
 //
-// Tests the VantIQ SDK API
+// Vantiq SDK Unit Tests
 //
-var VIQ        = require('../lib/sdk');
+var Vantiq     = require('../lib/sdk');
 var nock       = require('nock');
 var chai       = require('chai');
 chai.use(require('chai-as-promised'));
@@ -24,13 +24,13 @@ var PASSWORD    = 'no-one-will-guess';
 //
 // Tests
 //
-describe('VantIQ SDK API', function() {
+describe('Vantiq API', function() {
 
     describe('Initial Connection and Authentication', function() {
 
         var v;
         beforeEach(function() {
-            v = new VIQ(OPTS);
+            v = new Vantiq(OPTS);
         });
 
         it('can authenticate successfully', function() {
@@ -68,43 +68,43 @@ describe('VantIQ SDK API', function() {
                 });
         }
 
-        it('VIQ.select can prevent unauthorized tests', function() {
+        it('Vantiq.select can prevent unauthorized tests', function() {
             return authCheck(v.select('TestType'));
         });
 
-        it('VIQ.count can prevent unauthorized tests', function() {
+        it('Vantiq.count can prevent unauthorized tests', function() {
             return authCheck(v.count('TestType'));
         });
 
-        it('VIQ.insert can prevent unauthorized tests', function() {
+        it('Vantiq.insert can prevent unauthorized tests', function() {
             return authCheck(v.insert('TestType'), {});
         });
 
-        it('VIQ.update can prevent unauthorized tests', function() {
+        it('Vantiq.update can prevent unauthorized tests', function() {
             return authCheck(v.update('TestType', null, {}));
         });
 
-        it('VIQ.upsert can prevent unauthorized tests', function() {
+        it('Vantiq.upsert can prevent unauthorized tests', function() {
             return authCheck(v.upsert('TestType', {}));
         });
 
-        it('VIQ.delete can prevent unauthorized tests', function() {
+        it('Vantiq.delete can prevent unauthorized tests', function() {
             return authCheck(v.delete('TestType'));
         });
 
-        it('VIQ.publish can prevent unauthorized tests', function() {
+        it('Vantiq.publish can prevent unauthorized tests', function() {
             return authCheck(v.publish('/test/topic', {}));
         });
 
-        it('VIQ.execute can prevent unauthorized tests', function() {
+        it('Vantiq.execute can prevent unauthorized tests', function() {
             return authCheck(v.execute('testProcedure'));
         });
     });
 
     describe('Miscellaneous', function() {
 
-        it('VIQ.systemTypes', function() {
-            VIQ.SYSTEM_TYPES.should.include('types');
+        it('Vantiq.systemTypes', function() {
+            Vantiq.SYSTEM_TYPES.should.include('types');
         });
 
     });
@@ -117,7 +117,7 @@ describe('VantIQ SDK API', function() {
             n = nock(SERVER_URL)
                 .get('/authenticate')
                 .reply(200, { accessToken: TOKEN });
-            v = new VIQ(OPTS);
+            v = new Vantiq(OPTS);
             p = v.authenticate(USERNAME, PASSWORD);
         });
 

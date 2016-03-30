@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 //
-// Command Line Interface Application for VantIQ SDK
+// Command Line Interface Application for Vantiq SDK
 //
 var fs     = require('fs');
 var vorpal = require('vorpal')();
-var VIQ    = require('../index');
+var Vantiq = require('../index');
 
 //
 // Instance of the SDK
 //
-var v = null;
+var vantiq = null;
 
 //
 // Function that first checks to see if the CLI has connected
@@ -19,7 +19,7 @@ var v = null;
 //
 function ensureConnected(action) {
     return function(args, cb) {
-        if(v && v.isAuthenticated()) { 
+        if(vantiq && vantiq.isAuthenticated()) { 
             action.bind(this)(args, cb);
         } else {
             this.log("Please connect to the server before issuing requests to the server.");
@@ -35,11 +35,11 @@ vorpal
     .command('connect <server> <username> <password>')
     .description('Connects to the specified server with the given credentials.  If no arguments specified, looks in the CLI command line')
     .action(function(args, cb) {
-        v = new VIQ({
+        vantiq = new Vantiq({
             server: args.server,
             apiVersion: 1,
         });
-        v.authenticate(args.username, args.password)
+        vantiq.authenticate(args.username, args.password)
             .then(()     => { this.log("Connection succeeded with " + args.server);   cb(); })
             .catch((err) => { this.log(err); cb(); });
     });
@@ -51,7 +51,7 @@ vorpal
         var where = eval("where = " + args.where);
         var props = eval("where = " + args.props);
         var sort = eval("where = " + args.sort);
-        v.select(args.type, props, where, sort)
+        vantiq.select(args.type, props, where, sort)
             .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
             .catch((err)   => { this.log(err);                             cb(); });
     }));
@@ -61,7 +61,7 @@ vorpal
     .description('Counts the number of records for a given type with where clause in JSON form')
     .action(ensureConnected(function(args, cb) {
         var where = eval("where = " + args.where);
-        v.count(args.type, where)
+        vantiq.count(args.type, where)
             .then((result) => { this.log(result); cb(); })
             .catch((err)   => { this.log(err);    cb(); });
     }));
@@ -75,7 +75,7 @@ vorpal
                 this.log(err);
                 cb();
             } else {
-                v.insert(args.type, JSON.parse(data))
+                vantiq.insert(args.type, JSON.parse(data))
                     .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
                     .catch((err)   => { this.log(err);                             cb(); });                
             }
@@ -91,7 +91,7 @@ vorpal
                 this.log(err);
                 cb();
             } else {
-                v.update(args.type, args.key, JSON.parse(data))
+                vantiq.update(args.type, args.key, JSON.parse(data))
                     .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
                     .catch((err)   => { this.log(err);                             cb(); });                
             }
@@ -107,7 +107,7 @@ vorpal
                 this.log(err);
                 cb();
             } else {
-                v.upsert(args.type, JSON.parse(data))
+                vantiq.upsert(args.type, JSON.parse(data))
                     .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
                     .catch((err)   => { this.log(err);                             cb(); });                
             }
@@ -119,7 +119,7 @@ vorpal
     .description('Deletes one or more records identified by the given constraint')
     .action(ensureConnected(function(args, cb) {
         var where = eval("where = " + args.where);        
-        v.delete(args.type, where)
+        vantiq.delete(args.type, where)
             .then((result) => { this.log('Delete succeeded.'); cb(); })
             .catch((err)   => { this.log(err);                 cb(); });
     }));
@@ -133,7 +133,7 @@ vorpal
                 this.log(err);
                 cb();
             } else {
-                v.publish(args.topic, JSON.parse(data))
+                vantiq.publish(args.topic, JSON.parse(data))
                     .then((result) => { this.log('Publish succeeded.'); cb(); })
                     .catch((err)   => { this.log(err);                  cb(); });                
             }
@@ -146,7 +146,7 @@ vorpal
     .description('Executes the named procedure with optional arguments contained in a JSON file')
     .action(ensureConnected(function(args, cb) {
         var params = (args.params ? eval("params = " + args.params) : []);
-        return v.execute(args.procedure, params)
+        return vantiq.execute(args.procedure, params)
             .then((result) => { 
                 this.log(JSON.stringify(result, null, 2)); 
                 cb(); 
@@ -165,7 +165,7 @@ vorpal
 var pkgInfo = require('../package.json');
 
 vorpal
-    .log('VantIQ NodeJS SDK v' + pkgInfo.version)
+    .log('Vantiq NodeJS SDK v' + pkgInfo.version)
     .delimiter('> ')
     .parse(process.argv)
     .show();
