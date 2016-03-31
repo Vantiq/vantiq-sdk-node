@@ -19,13 +19,28 @@ var vantiq = null;
 //
 function ensureConnected(action) {
     return function(args, cb) {
-        if(vantiq && vantiq.isAuthenticated()) { 
-            action.bind(this)(args, cb);
-        } else {
-            this.log("Please connect to the server before issuing requests to the server.");
+        try {
+            if(vantiq && vantiq.isAuthenticated()) { 
+                action.bind(this)(args, cb);
+            } else {
+                this.log("Please connect to the server before issuing requests to the server.");
+                cb();
+            }
+        } catch(err) {
+            // If an exception is thrown, then just print it out and get back to the command line
+            this.log(err);
             cb();
         }
     };
+}
+
+//
+// Parse the string into an object assuming it is a definition of a JavaScript object
+// that can be 'eval'ed to create the object.  This may be any legal JS type, 
+// Object, Array, Primitive
+//
+function parseArg(arg) {
+    return eval("'use strict'; var x = " + arg + "; x ;");
 }
 
 //
@@ -48,10 +63,19 @@ vorpal
     .command('select <type> [props] [where] [sort]')
     .description('Selects data for a given type with optional constraints in JSON form')
     .action(ensureConnected(function(args, cb) {
-        var where = eval("where = " + args.where);
-        var props = eval("where = " + args.props);
-        var sort = eval("where = " + args.sort);
+        var where = parseArg(args.where);
+        var props = parseArg(args.props);
+        var sort  = parseArg(args.sort);
         vantiq.select(args.type, props, where, sort)
+            .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
+            .catch((err)   => { this.log(err);                             cb(); });
+    }));
+
+vorpal
+    .command('selectOne <type> <id>')
+    .description('Selects a single record using the given id')
+    .action(ensureConnected(function(args, cb) {
+        vantiq.selectOne(args.type, args.id)
             .then((result) => { this.log(JSON.stringify(result, null, 2)); cb(); })
             .catch((err)   => { this.log(err);                             cb(); });
     }));
@@ -60,7 +84,7 @@ vorpal
     .command('count <type> [where]')
     .description('Counts the number of records for a given type with where clause in JSON form')
     .action(ensureConnected(function(args, cb) {
-        var where = eval("where = " + args.where);
+        var where = parseArg(args.where);
         vantiq.count(args.type, where)
             .then((result) => { this.log(result); cb(); })
             .catch((err)   => { this.log(err);    cb(); });
@@ -118,8 +142,17 @@ vorpal
     .command('delete <type> <where>')
     .description('Deletes one or more records identified by the given constraint')
     .action(ensureConnected(function(args, cb) {
-        var where = eval("where = " + args.where);        
+        var where = parseArg(args.where);        
         vantiq.delete(args.type, where)
+            .then((result) => { this.log('Delete succeeded.'); cb(); })
+            .catch((err)   => { this.log(err);                 cb(); });
+    }));
+
+vorpal
+    .command('deleteOne <type> <id>')
+    .description('Deletes a single record with the given id')
+    .action(ensureConnected(function(args, cb) {
+        vantiq.deleteOne(args.type, args.id)
             .then((result) => { this.log('Delete succeeded.'); cb(); })
             .catch((err)   => { this.log(err);                 cb(); });
     }));
@@ -143,10 +176,27 @@ vorpal
 
 vorpal
     .command('execute <procedure> [params]')
-    .description('Executes the named procedure with optional arguments contained in a JSON file')
+    .description('Executes the named procedure with optional arguments in JSON form')
     .action(ensureConnected(function(args, cb) {
-        var params = (args.params ? eval("params = " + args.params) : []);
+        var params = (args.params ? parseArg(args.params) : {});
         return vantiq.execute(args.procedure, params)
+            .then((result) => { 
+                this.log(JSON.stringify(result, null, 2)); 
+                cb(); 
+            })
+            .catch((err) => { 
+                this.log(err);
+                cb(); 
+            });
+
+    }));
+
+vorpal
+    .command('query <source> [params]')
+    .description('Queries the named source with the given parameters in JSON form')
+    .action(ensureConnected(function(args, cb) {
+        var params = (args.params ? parseArg(args.params) : {});
+        return vantiq.query(args.source, params)
             .then((result) => { 
                 this.log(JSON.stringify(result, null, 2)); 
                 cb(); 

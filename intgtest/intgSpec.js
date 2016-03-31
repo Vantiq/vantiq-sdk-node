@@ -66,6 +66,13 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
+    it('can selectOne', function() {
+        return v.selectOne('types', 'TestType')
+            .then((result) => {
+                result.should.have.property('name', 'TestType');
+            });
+    });
+
     it('can count data with no constraints', function() {
         var count = 0;
         // Select types
@@ -205,6 +212,50 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
+    it('can deleteOne a record', function() {
+        var id = 'DLONE-' + (new Date()).getTime().toString();
+        var record = {
+            id: id,
+            ts: (new Date()).toISOString(),
+            x: 3.14159,
+            k: 42,
+            o: { a:1, b:2 }
+        };
+
+        // Insert record
+        var _id;
+        var count
+        return v.insert('TestType', record)
+            .then((result) => {
+                // Remember id
+                _id = result._id;
+
+                // Select all records back to see how many there
+                // are and that the specific one is there
+                return v.select('TestType', [ '_id', 'id' ]);
+            })
+            .then((result) => {
+                count = result.length;
+
+                // Ensure record was inserted
+                result.should.include.one.with.property('id', id);
+
+                // Delete record
+                return v.deleteOne('TestType', _id);
+            })
+            .then((result) => {
+                // Select records
+                return v.select('TestType', [ '_id', 'id' ]);
+            })
+            .then((result) => {
+                // Ensure only one record was deleted
+                result.length.should.equal(count - 1);
+
+                // Ensure the right data was deleted
+                result.should.not.include.one.with.property('id', id);
+            });
+    });
+
     it('can publish to a topic', function() {
         var id = 'PB-' + (new Date()).getTime().toString();
         var message = {
@@ -216,7 +267,7 @@ describe('Vantiq SDK Integration Tests', function() {
         };
 
         // Insert message
-        return v.publish('/test/topic', message)
+        return v.publish('topics', '/test/topic', message)
             .then((result) => {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
@@ -244,6 +295,5 @@ describe('Vantiq SDK Integration Tests', function() {
                 result.should.have.property('arg2', 'xxx');
             });
     });
-
 
 });

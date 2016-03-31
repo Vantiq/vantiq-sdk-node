@@ -53,20 +53,24 @@ To use this CLI, simply run the `vantiq-client` command.  The `help` command wil
     > help
 
       Commands:
-
+      
         help [command...]                       Provides help for a given command.
         exit                                    Exits application.
         connect <server> <username> <password>  Connects to the specified server with the given credentials.  If no arguments
                                                 specified, looks in the CLI command line
-        select <type> [where]                   Selects data for a given type with an optional constraint
-        count <type> [where]                    Counts the number of records for a given type with an optional constraint
+        select <type> [props] [where] [sort]    Selects data for a given type with optional constraints in JSON form
+        selectOne <type> <id>                   Selects a single record using the given id
+        count <type> [where]                    Counts the number of records for a given type with where clause in JSON form
         insert <type> <file>                    Inserts one or more records into the given type using the given JSON file
         update <type> <key> <file>              Updates the given record identified by the key for the given type using the given
                                                 JSON file
         upsert <type> <file>                    Inserts or updates the given record for the given type using the given JSON file
         delete <type> <where>                   Deletes one or more records identified by the given constraint
+        deleteOne <type> <id>                   Deletes a single record with the given id
         publish <topic> <file>                  Publishes a message in the given file onto the given topic
-        execute <procedure> [file]              Executes the named procedure with optional arguments contained in a JSON file
+        execute <procedure> [params]            Executes the named procedure with optional arguments in JSON form
+        query <source> [params]                 Queries the named source with the given parameters in JSON form
+
 
 ## Documentation
 

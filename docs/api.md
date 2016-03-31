@@ -7,20 +7,49 @@ This document defines the Vantiq Client SDK.  Please refer to the [Vantiq Refere
 
 ## Vantiq API
 
-The Vantiq object provides the main API for the Vantiq NodeJS SDK.
+The Vantiq object provides the main API for the Vantiq NodeJS SDK.  This SDK follows the Vantiq REST API resources
+model.
+
+### Resources
+
+Each of the SDK API methods corresponds to a specific REST API operation on a specific resource.  For example,
+`select` performs a query against a given resource.  `select('types', ...)` queries against defined data types.
+`select('procedures', ...)` queries against defined procedures.
+
+The available system resources are listed in `Vantiq.SYSTEM_RESOURCES` and include the following:
+
+Resource Name  | Type Name    | Description
+-------------- | ------------ | -----------
+documents      | ArsDocument  | Unstructured documents stored in the Vantiq system
+namespaces     | ArsNamespace | Namespaces defined in the Vantiq system
+nodes          | ArsPeerNode  | Node defined in the Vantiq system to support federation
+profiles       | ArsProfile   | Vantiq user permission profiles
+procedures     | ArsComponent | Procedures defined in the Vantiq system
+rules          | ArsRuleSet   | Rules defined in the Vantiq system
+scalars        | ArsScalar    | User-defined property type definitions
+sources        | ArsSource    | Data sources defined in the Vantiq system
+topics         | ArsTopic     | User-defined topics in the Vantiq system
+types          | ArsType      | Data types defined in the Vantiq system
+users          | ArsUser      | Vantiq user accounts
+
+Data types defined in the Vantiq system can also be used as resources.  For example, if you define data
+type `MyNewType`, then `MyNewType` is now a legal resource name that can be used in the API methods.
 
 ### API
 
 * [Vantiq](#vantiq)
 * [Vantiq.authenticate](#vantiq-authenticate)
 * [Vantiq.select](#vantiq-select)
+* [Vantiq.selectOne](#vantiq-selectOne)
 * [Vantiq.count](#vantiq-count)
 * [Vantiq.insert](#vantiq-insert)
 * [Vantiq.update](#vantiq-update)
 * [Vantiq.upsert](#vantiq-upsert)
 * [Vantiq.delete](#vantiq-delete)
+* [Vantiq.deleteOne](#vantiq-deleteOne)
 * [Vantiq.publish](#vantiq-publish)
 * [Vantiq.execute](#vantiq-execute)
+* [Vantiq.query](#vantiq-query)
 
 ### Error
 
@@ -33,9 +62,7 @@ The SDK expects that the first operation is to authenticate onto the
 specified Vantiq server.  After successfully authenticated, the client
 is free to issue any requests to the Vantiq server.
 
-`Vantiq` uses the [Vantiq RESTful API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).
-
-The `Vantiq` class is provided by the `vantiq-sdk` NPM module.
+This class exposes the [Vantiq RESTful API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).  The `Vantiq` class is provided by the `vantiq-sdk` NPM module.
 
 ### Signature
 
@@ -90,18 +117,17 @@ The `authenticate` method returns a promise that resolves if the authentication 
 ## <a id="vantiq-select"></a> Vantiq.select
 
 The `select` method issues a query to select all matching records for a given 
-type.  The `select` may query both user-defined types as well as system types, 
-such as `procedures` and `types` (see `Vantiq.SYSTEM_TYPES`).
+resource.
 
 ### Signature
 
-    var promise = vantiq.select(type, props, where, sort)
+    var promise = vantiq.select(resource, props, where, sort)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to query
+resource | String | Yes | The resource to query
 props| Array | No | Specifies the desired properties to be returned in each record.  An empty array or null value means all properties will be returned.
 where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
 sort | Object | No | Specifies the desired sort for the result set.
@@ -141,22 +167,58 @@ Selects all records for the `TestType` type returning only the `key` and `value`
             console.log(JSON.stringify(result[0], null, 2));
         });
 
-## <a id="vantiq-count"></a> Vantiq.count
+## <a id="vantiq-selectOne"></a> Vantiq.selectOne
 
-The `count` method is similar to the `select` method except it returns only the
-number of records rather than returning the records themselves.  The `count` may
-query both user-defined types as well as system types, such as `procedures` and
-`types` (see `Vantiq.SYSTEM_TYPES`).
+The `selectOne` method issues a query to return the single record identified 
+by the given identifier.
 
 ### Signature
 
-    var promise = vantiq.count(type, where)
+    var promise = vantiq.selectOne(resouce, id)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to query
+resource | String | Yes | The resource to query
+id   | String | Yes | The id for the given record
+
+### Returns
+
+The `selectOne` method returns a promise that resolves to the matching
+record or null if the record does not exist.  Upon any failure, the
+promise is rejected with an [error](#error).
+
+### Example
+
+Select the `TestType` definition from the `types` resource.
+
+    vantiq.selectOne('types', 'TestType')
+        .then((result) => {
+            console.log(JSON.stringify(result, null, 2));
+        });
+
+Selects a `TestType` record with `_id` equal to `23425231ad31f`.
+
+    vantiq.selectOne('TestType', '23425231ad31f')
+        .then((result) => {
+            console.log(JSON.stringify(result, null, 2));
+        });
+
+## <a id="vantiq-count"></a> Vantiq.count
+
+The `count` method is similar to the `select` method except it returns only the
+number of records rather than returning the records themselves.
+
+### Signature
+
+    var promise = vantiq.count(resource, where)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+resource | String | Yes | The resource to query
 where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
 
 The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/api/developer.html#api-operations).
@@ -184,17 +246,17 @@ Counts the number of `TestType` with a `value` greater than 10.
 
 ## <a id="vantiq-insert"></a> Vantiq.insert
 
-The `insert` method creates a new record of a given type.
+The `insert` method creates a new record of a given resource.
 
 ### Signature
 
-    var promise = vantiq.insert(type, object)
+    var promise = vantiq.insert(resource, object)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to insert
+resource | String | Yes | The resource to insert
 object | Object | Yes | The object to insert
 
 ### Returns
@@ -218,19 +280,19 @@ Inserts an object of type `TestType`.
 
 ## <a id="vantiq-update"></a> Vantiq.update
 
-The `update` method updates an existing record of a given type.  This method
+The `update` method updates an existing record of a given resource.  This method
 supports partial updates meaning that only the properties provided are updated.
 Any properties not specified are not changed in the underlying record.
 
 ### Signature
 
-    var promise = vantiq.update(type, id, object)
+    var promise = vantiq.update(resource, id, object)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to update
+resource | String | Yes | The resource to update
 id   | String | Yes | The "_id" internal identifier for the record
 props | Object | Yes | The properties to update in the record
 
@@ -258,17 +320,17 @@ Updates a given `TestType` record
 
 The `upsert` method either creates or updates a record in the database depending
 if the record already exists.  The method tests for existence by looking at the
-natural keys defined on the type.
+natural keys defined on the resource.
 
 ### Signature
 
-    var promise = vantiq.upsert(type, object)
+    var promise = vantiq.upsert(resource, object)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to upsert
+resource | String | Yes | The resource to upsert
 object | Object | Yes | The object to upsert
 
 ### Returns
@@ -292,19 +354,19 @@ Inserts an object of type `TestType`.
 
 ## <a id="vantiq-delete"></a> Vantiq.delete
 
-The `delete` method removes records from the system for a given type.  Deletes always
+The `delete` method removes records from the system for a given resource.  Deletes always
 require a constraint indicating which records to remove.
 
 ### Signature
 
-    var promise = vantiq.delete(type, where)
+    var promise = vantiq.delete(resource, where)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-type | String | Yes | The data type to query
-where | Object | Yes | Specifies which records to remove.
+resource | String | Yes | The resource to remove
+where | Object | Yes | Specifies which records to remove
 
 The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/api/developer.html#api-operations).
 
@@ -329,32 +391,86 @@ Removes all records of `TestType` with a `value` greater than 10.
             console.log("Removed all records with value > 10");
         });
 
-## <a id="vantiq-publish"></a> Vantiq.publish
+## <a id="vantiq-selectOne"></a> Vantiq.deleteOne
 
-The `publish` method publishes a message onto a given topic.  Messages published
-onto topics can trigger rules to facilitate identifying situations.
-
-Topics are slash-delimited strings, such as '/test/topic'.  Vantiq system-defined
-topics begin with `/type`, `/property`, `/system`, and `/source`.
+The `deleteOne` method removes a single record specified by the given identifier.
 
 ### Signature
 
-    var promise = vantiq.publish(topic, message)
+    var promise = vantiq.deleteOne(resource, id)
 
 ### Parameters
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-topic | String | Yes | The topic on which to publish.
-message | Object | Yes | The message to publish
+resource | String | Yes | The resource to remove
+id   | String | Yes | The id for the given record
 
 ### Returns
 
-The `publish` method returns a promise that resolves when the message
-has been published successfully.  Upon any failure, the promise is rejected with 
+The `deleteOne` method returns a promise that resolves to `true` if the record was removed
+or `false` if no record was found.  Upon any failure, the promise is rejected with an 
+[error](#error).
+
+### Example
+
+Removes the `TestType` definition from the `types` resource.
+
+    vantiq.deleteOne('types', 'TestType')
+        .then((result) => {
+            if(result) {
+                console.log("Delete succeeded.");
+            }
+        });
+
+Removes the `TestType` record with `_id` equal to `23425231ad31f`.
+
+    vantiq.deleteOne('TestType', '23425231ad31f')
+        .then((result) => {
+            if(result) {
+                console.log("Delete succeeded.");
+            }
+        });
+
+## <a id="vantiq-publish"></a> Vantiq.publish
+
+The `publish` method supports publishing to a topic or a source.
+
+Publishing a message to a given topic allows for rules to be defined
+that trigger based on the publish event.  Topics are slash-delimited strings, 
+such as '/test/topic'.  Vantiq reserves  `/type`, `/property`, `/system`, and 
+`/source` as system topic namespaces and should not be published to.  The 
+`payload` is the message to be sent.
+
+Calling `publish` on a source performs a publish (asynchronous call) on the
+specified source.  The `payload` is the parameters required to issue the
+publish operation on the source.
+
+### Signature
+
+    var promise = vantiq.publish(resource, id, payload)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+resource | String | Yes | The resource to publish.  Must be either 'topics' or 'sources'.
+id       | String | Yes | The id for the specific resource to use.  An example topic is '/test/topic'.  An example source is 'mqttChannel'.
+payload  | Object | Yes | For topics, the payload is the message to send.  For sources, this is the parameters for the source.
+
+For sources, the parameters required are source specific and are the same as those required
+when performing a `PUBLISH ... TO SOURCE ... USING params`.  Please refer to the specific source definition
+documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/api/index.html).
+
+### Returns
+
+Since the `publish` operation is an asynchronous action, the returned value is a boolean indicating if the 
+`publish` occurred successfully.  Upon any failure, the promise is rejected with 
 an [error](#error).
 
 ### Example
+
+Send a message onto the `/test/topic` topic.
 
     var message = {
         key:   'AnotherKey',
@@ -362,10 +478,23 @@ an [error](#error).
         value: 13
     };
     
-    vantiq.publish('/test/topic', message)
+    vantiq.publish('topics', '/test/topic', message)
         .then((result) => {
             console.log("Published message successfully.");
         });
+
+Send a message to a SMS source `mySMSSource`.
+
+    var params = {
+        body: "Nice message to the user",
+        to: "+16505551212"
+    };
+
+    vantiq.publish('sources', 'mySMSSource', params)
+        .then((result) => {
+            console.log("Published message successfully.");
+        });
+
 
 ## <a id="vantiq-execute"></a> Vantiq.execute
 
@@ -380,8 +509,8 @@ take parameters (i.e. arguments) and produce a result.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-procedure | String | Yes | The procedure to execute.
-params | Object | No | An object that holds the parameters.
+procedure | String | Yes | The procedure to execute
+params | Object | No | An object that holds the parameters
 
 The parameters may be provided as an array where the arguments are given in order.
 Alternatively, the parameters may be provided as an object where the arguments
@@ -404,6 +533,51 @@ Executes an `sum` procedure that takes `arg1` and `arg2` arguments and returns t
 Using named arguments.
 
     vantiq.execute('sum', { arg1: 1, arg2: 2 })
+        .then((result) => {
+            console.log("The sum of 1 + 2 = " + result.total);
+        });
+
+
+## <a id="vantiq-query"></a> Vantiq.query
+
+The `query` method performs a query (synchronous call) on the specified source.  The query can
+take parameters (i.e. arguments) and produce a result.
+
+### Signature
+
+    var promise = vantiq.query(source, params)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+source | String | Yes | The source to perform the query
+params | Object | No | An object that holds the parameters
+
+The parameters required are source specific and are the same as those required
+when performing a `SELECT ... FROM SOURCE ... WITH params`.  Please refer to the specific source definition
+documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/api/index.html).
+
+### Returns
+
+The `query` method returns a promise that resolves to the returned value from the source.  
+Upon any failure, the promise is rejected with an [error](#error).
+
+### Example
+
+Query a REST source `adder` that returns the total of the given parameters.
+
+    var params = {
+        path: '/api/adder',
+        method: 'POST',
+        contentType: 'application/json',
+        body: {
+            arg1: 1,
+            arg2: 2
+        }
+    };
+
+    vantiq.query('sum', params)
         .then((result) => {
             console.log("The sum of 1 + 2 = " + result.total);
         });

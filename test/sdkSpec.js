@@ -72,6 +72,10 @@ describe('Vantiq API', function() {
             return authCheck(v.select('TestType'));
         });
 
+        it('Vantiq.selectOne can prevent unauthorized tests', function() {
+            return authCheck(v.selectOne('TestType', 'abc'));
+        });
+
         it('Vantiq.count can prevent unauthorized tests', function() {
             return authCheck(v.count('TestType'));
         });
@@ -92,19 +96,27 @@ describe('Vantiq API', function() {
             return authCheck(v.delete('TestType'));
         });
 
+        it('Vantiq.deleteOne can prevent unauthorized tests', function() {
+            return authCheck(v.deleteOne('TestType', 'abc'));
+        });
+
         it('Vantiq.publish can prevent unauthorized tests', function() {
-            return authCheck(v.publish('/test/topic', {}));
+            return authCheck(v.publish('topics', '/test/topic', {}));
         });
 
         it('Vantiq.execute can prevent unauthorized tests', function() {
             return authCheck(v.execute('testProcedure'));
         });
+
+        it('Vantiq.query can prevent unauthorized tests', function() {
+            return authCheck(v.query('testSource'), {});
+        });
     });
 
     describe('Miscellaneous', function() {
 
-        it('Vantiq.systemTypes', function() {
-            Vantiq.SYSTEM_TYPES.should.include('types');
+        it('Vantiq.SYSTEM_RESOURCES', function() {
+            Vantiq.SYSTEM_RESOURCES.should.include('types');
         });
 
     });
@@ -153,6 +165,22 @@ describe('Vantiq API', function() {
                     .then((result) => {
                         result.length.should.equal(1);
                         result[0].b.should.equal('bingo');
+                    });
+            });
+        });
+
+        it('can perform a selectOne', function() {
+            n.get('/api/v1/resources/MyType/abc')
+                .reply(200, { 
+                    a: 1, 
+                    b: 'bingo'
+                });
+
+            return p.then(function() {
+                return v.selectOne('MyType', 'abc')
+                    .then((result) => {
+                        result.should.have.property('a', 1);
+                        result.should.have.property('b', 'bingo');
                     });
             });
         });
@@ -265,14 +293,47 @@ describe('Vantiq API', function() {
             });
         });
 
-        it('can perform a publish', function() {
+        it('can perform a deleteOne', function() {
+            n.delete('/api/v1/resources/MyType/abc')
+                .reply(204);
+
+            return p.then(function() {
+                return v.deleteOne('MyType', 'abc')
+                    .then((result) => {
+                        result.should.equal(true);
+                    });
+            });
+        });        
+
+        it('can perform a publish on topic', function() {
             n.post('/api/v1/resources/topics//foo/bar')
                 .reply(200);
 
             return p.then(function() {
-                return v.publish('/foo/bar', { a: 1 })
+                return v.publish('topics', '/foo/bar', { a: 1 })
                     .then((result) => {
                         result.should.equal(true);
+                    });
+            });
+        });
+
+        it('can perform a publish on source', function() {
+            n.post('/api/v1/resources/sources/foo')
+                .reply(200);
+
+            return p.then(function() {
+                return v.publish('sources', 'foo', { a: 1 })
+                    .then((result) => {
+                        result.should.equal(true);
+                    });
+            });
+        });
+
+        it('can not perform publish on other types', function() {
+            return p.then(function() {
+                return v.publish('types', 'foo', { a: 1 })
+                    .catch((err) => {
+                        err.message.should.equal('Only "sources" and "topics" support publish');
                     });
             });
         });
@@ -283,6 +344,18 @@ describe('Vantiq API', function() {
 
             return p.then(function() {
                 return v.execute('adder', { arg1: 1, arg2: 2 })
+                    .then((result) => {
+                        result.total.should.equal(3);
+                    });
+            });
+        });
+
+        it('can query a source', function() {
+            n.post('/api/v1/resources/sources/adder/query')
+                .reply(200, { total: 3 });
+
+            return p.then(function() {
+                return v.query('adder', { arg1: 1, arg2: 2 })
                     .then((result) => {
                         result.total.should.equal(3);
                     });
