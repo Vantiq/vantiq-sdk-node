@@ -1,6 +1,6 @@
 <div style="height: 50px"><img style="float:right" alt="Vantiq Logo" src="http://vantiq.com/wp-content/uploads/2015/12/vantiq.png"/></div>
 
-[![Build Status](https://travis-ci.com/Vantiq/vantiq-sdk-node.svg?token=jUrpVsQpcEipBxV7WZED&branch=master)](https://travis-ci.com/Vantiq/vantiq-sdk-node)
+[![Build Status](https://travis-ci.org/Vantiq/vantiq-sdk-node.svg?branch=master)](https://travis-ci.org/Vantiq/vantiq-sdk-node)
 
 # Vantiq Node.JS SDK
 

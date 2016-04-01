@@ -1,5 +1,5 @@
 {
-  "name": "vantiq-sdk-node",
+  "name": "vantiq-sdk",
   "version": "1.0.0",
   "description": "Vantiq NodeJS SDK",
   "main": "index.js",
@@ -22,5 +22,17 @@
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vantiq/vantiq-sdk-node"
+  },
+  "bugs": {
+    "url": "https://github.com/Vantiq/vantiq-sdk-node/issues",
+    "email": "support@vantiq.com"
+  },
+  "engines": {
+    "node": ">= 4.0.0"
+  },
+  "homepage": "http://vantiq.com/",
   "license": "MIT"
 }
