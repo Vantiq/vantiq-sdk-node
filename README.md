@@ -25,14 +25,14 @@ The first step is to create an instance of the Vantiq SDK providing the URL of t
         apiVersion: 1
     });
 
-where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to connect to.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.  To establish a connection to the server, use the `authenticate` method:
+where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.  To establish a connection to the server, use the `authenticate` method:
 
     var promise = vantiq.authenticate(<username>, <password>);
     promise.then((result) => {
         console.log('Connected!');
     });
 
-The `<username>` and `password` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-meomry an access token that subsequent API calls will use.
+The `<username>` and `password` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-memory an access token that subsequent API calls will use.
 
 Now, you are able to perform any SDK calls to the Vantiq server.  For example, the following prints out the list of types that have been defined:
 

@@ -166,7 +166,7 @@ vorpal
                 this.log(err);
                 cb();
             } else {
-                vantiq.publish(args.topic, JSON.parse(data))
+                vantiq.publish("topics", args.topic, JSON.parse(data))
                     .then((result) => { this.log('Publish succeeded.'); cb(); })
                     .catch((err)   => { this.log(err);                  cb(); });                
             }
