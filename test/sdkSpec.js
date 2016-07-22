@@ -350,6 +350,18 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can evaluate a model', function() {
+            n.post('/api/v1/resources/analyticsmodels/testModel')
+                .reply(200, { score: 'good' });
+
+            return p.then(function() {
+                return v.evaluate('testModel', { arg1: 1, arg2: 2 })
+                    .then((result) => {
+                        result.score.should.equal('good');
+                    });
+            });
+        });
+        
         it('can query a source', function() {
             n.post('/api/v1/resources/sources/adder/query')
                 .reply(200, { total: 3 });

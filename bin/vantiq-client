@@ -192,6 +192,23 @@ vorpal
     }));
 
 vorpal
+    .command('evaluate <analyticsModel> [params]')
+    .description('Evaluates the named analytics model with input parameters as a JSON object')
+    .action(ensureConnected(function(args, cb) {
+        var params = (args.params ? parseArg(args.params) : {});
+        return vantiq.evaluate(args.analyticsModel, params)
+            .then((result) => { 
+                this.log(JSON.stringify(result, null, 2)); 
+                cb(); 
+            })
+            .catch((err) => { 
+                this.log(err);
+                cb(); 
+            });
+
+    }));
+
+vorpal
     .command('query <source> [params]')
     .description('Queries the named source with the given parameters in JSON form')
     .action(ensureConnected(function(args, cb) {

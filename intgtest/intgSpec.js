@@ -296,4 +296,10 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
+    it('can evaluate an analytics model', function() {
+        return v.evaluate('TestModel', { value: 4.0 })
+            .then((result) => {
+                result.should.equal(2.0);
+            });
+    });
 });
