@@ -111,6 +111,10 @@ describe('Vantiq API', function() {
         it('Vantiq.query can prevent unauthorized tests', function() {
             return authCheck(v.query('testSource'), {});
         });
+
+        it('Vantiq.subscribe can prevent unauthorized tests', function() {
+            return authCheck(v.subscribe('topics', '/test/topic', () => {}), {});
+        });
     });
 
     describe('Miscellaneous', function() {
@@ -387,6 +391,41 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can not perform subscribe on other resources', function() {
+            return p.then(function() {
+                return v.subscribe('procedures', 'foo', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Only "topics", "sources" and "types" support subscribe');
+                    });
+            });
+        });
+
+        it('can ensure subscribe on sources do not have operations', function() {
+            return p.then(function() {
+                return v.subscribe('sources', 'foo', 'dummyop', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation only supported for "types"');
+                    });
+            });
+        });
+
+        it('can ensure subscribe on topics do not have operations', function() {
+            return p.then(function() {
+                return v.subscribe('topics', 'foo', 'dummyop', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation only supported for "types"');
+                    });
+            });
+        });
+
+        it('can ensure subscribe on types have operations', function() {
+            return p.then(function() {
+                return v.subscribe('types', 'foo', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation required for "types"');
+                    });
+            });
+        });
     });
 
 

@@ -11,6 +11,7 @@ var should        = chai.should();
 // Test configuration
 //
 var SERVER_URL  = 'https://mock.vantiq.com';
+var WSS_URL     = 'wss://mock.vantiq.com/api/v1/wsock/websocket';
 var API_VERISON = 1;
 var OPTS        = {
     server:     SERVER_URL,
@@ -129,6 +130,7 @@ describe('VantiqSession API', function() {
 
         var v;
         var n;
+        var p;
         beforeEach(function() {
             n = nock(SERVER_URL)
                 .get('/authenticate')
@@ -188,8 +190,6 @@ describe('VantiqSession API', function() {
                     });
             });
         });
-
-
 
     });
 

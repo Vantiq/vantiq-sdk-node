@@ -1,22 +1,23 @@
 {
   "name": "vantiq-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Vantiq NodeJS SDK",
   "main": "index.js",
   "directories": {
-    "bin": "bin", 
+    "bin": "bin",
     "doc": "docs",
     "lib": "lib",
     "test": "test"
   },
   "dependencies": {
-    "vorpal": "~1.10.9"
+    "vorpal": "~1.10.9",
+    "websocket": "^1.0.23"
   },
   "devDependencies": {
-    "mocha": "~2.4.5",
     "chai": "~3.5.0",
     "chai-as-promised": "~5.3.0",
     "chai-things": "~0.2.0",
+    "mocha": "~2.4.5",
     "nock": "~7.5.0"
   },
   "scripts": {

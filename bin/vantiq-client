@@ -48,7 +48,7 @@ function parseArg(arg) {
 //
 vorpal
     .command('connect <server> <username> <password>')
-    .description('Connects to the specified server with the given credentials.  If no arguments specified, looks in the CLI command line')
+    .description('Connects to the specified server with the given credentials.')
     .action(function(args, cb) {
         vantiq = new Vantiq({
             server: args.server,
@@ -57,6 +57,26 @@ vorpal
         vantiq.authenticate(args.username, args.password)
             .then(()     => { this.log("Connection succeeded with " + args.server);   cb(); })
             .catch((err) => { this.log(err); cb(); });
+    });
+
+vorpal
+    .command('connect-token <server> <accessToken>')
+    .description('Connects to the specified server using the given access token.')
+    .action(function(args, cb) {
+        vantiq = new Vantiq({
+            server: args.server,
+            apiVersion: 1,
+        });
+        vantiq.accessToken = args.accessToken;
+        cb();
+    });
+
+vorpal
+    .command('access-token')
+    .description('Prints out the current access token.')
+    .action(function(args, cb) {
+        this.log(vantiq.accessToken);
+        cb();
     });
 
 vorpal
@@ -225,6 +245,47 @@ vorpal
 
     }));
 
+vorpal
+    .command('subscribe <resource> <name> [operation]')
+    .description('Subscribe to events listening in real-time')
+    .action(ensureConnected(function(args, cb) {
+
+        // Create callback that prints the message to the console.
+        var callback = (msg) => {
+            var prefix = '[' + args.resource + '/' + args.name;
+            if(args.operation) {
+                prefix += '/' + args.operation;
+            }
+            prefix += '] ';
+            var str = prefix + JSON.stringify(msg, null, 2);
+            this.log(str);
+        };
+
+        var p = null;
+        if(args.resource === 'types') {
+            p = vantiq.subscribe(args.resource, args.name, args.operation, callback);
+        } else {
+            p = vantiq.subscribe(args.resource, args.name, callback);
+        }
+
+        return p.then((result) => {
+                this.log("Subscription Successful");
+                cb();
+            })
+            .catch((err) => {
+                this.log(err);
+                cb();
+            });
+    }));
+
+vorpal
+    .command('unsubscribe')
+    .description('Unsubscribes to all events and closes the WebSocket')
+    .action(ensureConnected(function(args, cb) {
+        vantiq.unsubscribeAll();
+        cb();
+    }));
+
 //
 // Start the command line.  If a command was present on the CLI command
 // line, it will be executed.
@@ -235,4 +296,5 @@ vorpal
     .log('Vantiq NodeJS SDK v' + pkgInfo.version)
     .delimiter('> ')
     .parse(process.argv)
+    .history('Vantiq-NodeJS-SDK-CLI')
     .show();

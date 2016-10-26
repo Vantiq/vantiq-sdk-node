@@ -37,6 +37,7 @@ if(!SERVER || !USERNAME || !PASSWORD) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
+    this.timeout(5000);
 
     var v;
     before(function() {
@@ -62,7 +63,7 @@ describe('Vantiq SDK Integration Tests', function() {
     it('can select data with sorting', function() {
         return v.select('types', [ '_id', 'name' ], {}, { name: -1 })
             .then((result) => {
-                result[0].name.localeCompare(result[1].name).should.equal(1);
+                result[0].name.localeCompare(result[1].name).should.equal(-1);
             });
     });
 
@@ -302,4 +303,70 @@ describe('Vantiq SDK Integration Tests', function() {
                 result.should.equal(2.0);
             });
     });
+
+    it('can subscribe to a publish event', function() {
+        var resp = null;
+        return v.subscribe('topics', '/test/topic', (r) => {
+            resp = r;
+        }).
+        then(function() {
+            return v.publish('topics', '/test/topic', { foo: 'bar' });
+        })
+        .then(function() {
+            // Delay a bit to allow for event processing
+            return new Promise((resolve) => setTimeout(resolve, 500));
+        })
+        .then(function() {
+            should.exist(resp);
+            resp.headers['X-Request-Id'].should.equal('/topics//test/topic');
+            resp.body.value.foo.should.equal('bar');
+        });
+    });
+
+    it('can subscribe to a source event', function() {
+        this.timeout(10000);
+
+        var resp = null;
+        return v.subscribe('sources', 'JSONPlaceholder', (r) => {
+            resp = r;
+        })
+        .then(function() {
+            // Delay until we can get a response
+            return new Promise((resolve) => setTimeout(resolve, 5000));
+        })
+        .then(function() {
+            should.exist(resp);
+            resp.headers['X-Request-Id'].should.equal('/sources/JSONPlaceholder');
+            resp.body.path.should.equal('/sources/JSONPlaceholder/receive');
+            resp.body.value.length.should.equal(100);
+        });
+    });
+
+    it('can subscribe to a type event', function() {
+        var resp;
+        return v.subscribe('types', 'TestType', 'insert', (r) => {
+            resp = r;
+        })
+        .then(function() {
+            var id = 'SUB-' + (new Date()).getTime().toString();
+            var record = {
+                id: id,
+                ts: (new Date()).toISOString(),
+                x: 3.14159,
+                k: 42,
+                o: { a:1, b:2 }
+            };
+            return v.insert('TestType', record);
+        })
+        .then(function() {
+            // Delay a bit to allow for event processing
+            return new Promise((resolve) => setTimeout(resolve, 500));
+        })
+        .then(function() {
+            should.exist(resp);
+            resp.headers['X-Request-Id'].should.equal('/types/TestType/insert');
+            resp.body.value.k.should.equal(42);
+        });
+    });
+
 });

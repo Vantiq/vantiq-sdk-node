@@ -20,6 +20,8 @@ The available system resources are listed in `Vantiq.SYSTEM_RESOURCES` and inclu
 
 Resource Name  | Type Name    | Description
 -------------- | ------------ | -----------
+analyticsmodels| ArsAnalyticsModel | Analytical models that can be imported and executed in Vantiq
+configurations | ArsRuleConfiguration | Configurations of Vantiq resources
 documents      | ArsDocument  | Unstructured documents stored in the Vantiq system
 namespaces     | ArsNamespace | Namespaces defined in the Vantiq system
 nodes          | ArsPeerNode  | Node defined in the Vantiq system to support federation
@@ -39,6 +41,7 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 
 * [Vantiq](#vantiq)
 * [Vantiq.authenticate](#vantiq-authenticate)
+* [Vantiq.accessToken](#vantiq-accessToken)
 * [Vantiq.select](#vantiq-select)
 * [Vantiq.selectOne](#vantiq-selectOne)
 * [Vantiq.count](#vantiq-count)
@@ -50,6 +53,7 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 * [Vantiq.publish](#vantiq-publish)
 * [Vantiq.execute](#vantiq-execute)
 * [Vantiq.query](#vantiq-query)
+* [Vantiq.subscribe](#vantiq-subscribe)
 
 ### Error
 
@@ -113,6 +117,23 @@ The `authenticate` method returns a promise that resolves if the authentication 
     var promise = vantiq.authenticate('joe@user', 'my-secr3t-passw0rd!#!')
                 .then((result) => console.log('Authenticated!'))
                 .catch((err)   => console.error(err));
+
+## <a id="vantiq-accessToken"></a> Vantiq.accessToken
+
+The Vantiq `accessToken` is the token returned during an `authenticate` call used
+to maintain authenticated access during the subsequent invocations using this SDK.
+Typically, the access token is resolved through the `authenticate` method.  However,
+the token can be explicitly set if the token is already available, such as a long-lived
+token issued by the Vantiq server.
+
+### Signature
+
+    // To retrieve the current access token
+    var accessToken = vantiq.accessToken;
+
+    // To set a new access token
+    vantiq.accessToken = tokenFromServer;
+
 
 ## <a id="vantiq-select"></a> Vantiq.select
 
@@ -580,6 +601,83 @@ Query a REST source `adder` that returns the total of the given parameters.
     vantiq.query('sum', params)
         .then((result) => {
             console.log("The sum of 1 + 2 = " + result.total);
+        });
+
+## <a id="vantiq-subscribe"></a> Vantiq.subscribe
+
+The `subscribe` method creates a WebSocket to the Vantiq server and listens for specified events.  The provided
+callback is executed whenever a matching event occurs.
+
+### Signature
+
+    var promise = vantiq.subscribe(resource, name, [operation,] callback)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+resource | String | Yes | The resource event to subscribe.  Must be either 'topics' or 'sources' or 'types'.
+name     | String | Yes | The resource name that identifies the specific resource event.  For topics, this is the topic name (e.g. '/my/topic/').  For sources, this is the source name.  For types, this is the data type name.
+operation| String | No  | This only applies for 'types' and specifies the operation to listen to (e.g. 'insert', 'update', or 'delete')
+callback | Function| Yes | This is the callback that executes whenever a matching event occurs.  The signiature is: `callback(message)`.
+
+The `message` that is provided when an event occurs contains the following:
+
+Name | Type | Description
+:--: | :--: | -----------
+status | int | The HTTP status code associated with the message, usually 100.
+contentType | String | The content type for the body of the message.  Typically, this is `application/json`.
+headers | Object | The headers associated with the event.  The `X-Request-Id` header will be based on the resource path for the event.
+body | Object | The content of the event.
+
+The structure of the body of the event is:
+
+Name | Type | Description
+:--: | :--: | -----------
+path | String | The full event path
+value | Object | The payload of the event.
+
+### Returns
+
+The `subscribe` method returns a promise that resolves when the subscription has successfully connected.
+Upon any failure, the promise is rejected with an [error](#error).
+
+### Example
+
+Create a subscription to the `/test/topic` topic that prints out when events are published to the topic.
+
+    function callback(message) {
+        console.log("Received message at " + new Date());
+        console.log("Event Payload = " + JSON.stringify(message.body.value, null, 2));
+    }
+
+    vantiq.subscribe('topics', '/test/topic', callback)
+        .then(() => {
+            console.log("Subscription succeeded.");
+        });
+
+Create a subscription to the `MySource` source that prints out when messages arrive at the source.
+
+    function callback(message) {
+        console.log("Received message at " + new Date());
+        console.log("Source Message = " + JSON.stringify(message.body.value, null, 2));
+    }
+
+    vantiq.subscribe('sources', 'MySource', callback)
+        .then(() => {
+            console.log("Subscription succeeded.");
+        });
+
+Create a subscription to the `MyDataType` type for that prints out when that type has been updated.
+
+    function callback(message) {
+        console.log("Received message at " + new Date());
+        console.log("Updated Value = " + JSON.stringify(message.body.value, null, 2));
+    }
+
+    vantiq.subscribe('types', 'MyDataType', 'update', callback)
+        .then(() => {
+            console.log("Subscription succeeded.");
         });
 
 # <a id="error"></a> Error
