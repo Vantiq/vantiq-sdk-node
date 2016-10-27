@@ -10,8 +10,8 @@
     "test": "test"
   },
   "dependencies": {
-    "vorpal": "~1.10.9",
-    "websocket": "^1.0.23"
+    "sockjs-client": "^1.1.1",
+    "vorpal": "~1.10.9"
   },
   "devDependencies": {
     "chai": "~3.5.0",

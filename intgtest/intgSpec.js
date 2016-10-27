@@ -63,7 +63,7 @@ describe('Vantiq SDK Integration Tests', function() {
     it('can select data with sorting', function() {
         return v.select('types', [ '_id', 'name' ], {}, { name: -1 })
             .then((result) => {
-                result[0].name.localeCompare(result[1].name).should.equal(-1);
+                result[0].name.localeCompare(result[1].name).should.equal(1);
             });
     });
 
