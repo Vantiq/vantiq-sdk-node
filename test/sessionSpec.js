@@ -124,6 +124,18 @@ describe('VantiqSession API', function() {
             return authCheck(v.delete('/resources/types'));
         });
 
+        it('VantiqSession.subscribe can prevent unauthorized tests', function() {
+            return authCheck(v.subscribe('/resources/types'));
+        });
+
+        it('VantiqSession.upload can prevent unauthorized tests', function() {
+            return authCheck(v.upload('/resources/documents', 'somefile', 'text/plain', 'somefile'));
+        });
+
+        it('VantiqSession.download can prevent unauthorized tests', function() {
+            return authCheck(v.download('somefile'));
+        });
+
     });
 
     describe('Request Processing', function() {

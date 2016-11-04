@@ -17,6 +17,8 @@
 //
 
 var Vantiq     = require('../lib/sdk');
+var path       = require('path');
+var stream     = require('stream');
 var chai       = require('chai');
 chai.use(require('chai-as-promised'));
 chai.use(require('chai-things'));
@@ -367,6 +369,47 @@ describe('Vantiq SDK Integration Tests', function() {
             resp.headers['X-Request-Id'].should.equal('/types/TestType/insert');
             resp.body.value.k.should.equal(42);
         });
+    });
+
+    it('can upload and download a file', function() {
+        var testPath = path.dirname(this.test.file) + '/../test/resources/testFile.txt';
+        var testFile = path.basename(testPath);
+        var testDocPath = 'assets/' + testFile;
+
+        return v.upload(testPath, 'text/plain', testDocPath)
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('text/plain');
+                result.content.should.equal('/docs/assets/' + testFile);
+
+                return v.selectOne('/documents', testDocPath);
+            })
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('text/plain');
+                result.content.should.equal('/docs/assets/' + testFile);
+
+                return v.download('/docs/assets/' + testFile);
+            })
+            .then((resp) => {
+                var isReadable = (resp instanceof stream.Readable);
+                isReadable.should.equal(true);
+
+                resp.headers['content-type'].should.equal('text/plain');
+
+                // Extract content from downloaded file
+                return new Promise((resolve, reject) => {
+                    var content = '';
+                    resp.on('data', (chunk) => { content += chunk; });
+                    resp.on('end', () => {
+                        resolve(content);
+                    });
+                    resp.on('error', (err) => { reject(err); });
+                });
+            })
+            .then((result) => {
+                result.should.equal('This is a test file used for mock and integration unit testing.\n');
+            });
     });
 
 });

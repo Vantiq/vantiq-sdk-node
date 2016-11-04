@@ -54,6 +54,9 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 * [Vantiq.execute](#vantiq-execute)
 * [Vantiq.query](#vantiq-query)
 * [Vantiq.subscribe](#vantiq-subscribe)
+* [Vantiq.upload](#vantiq-upload)
+* [Vantiq.download](#vantiq-download)
+* [Vantiq.unsubscribeAll](#vantiq-unsubscribeAll)
 
 ### Error
 
@@ -679,6 +682,106 @@ Create a subscription to the `MyDataType` type for that prints out when that typ
         .then(() => {
             console.log("Subscription succeeded.");
         });
+
+## <a id="vantiq-unsubscribeAll"></a> Vantiq.unsubscribeAll
+
+The `unsubscribeAll` method removes all active subscriptions to the Vantiq server by
+closing the WebSocket.
+
+### Signature
+
+    void vantiq.unsubscribeAll()
+
+### Parameters
+
+N/A
+
+### Returns
+
+N/A
+
+### Example
+
+    vantiq.unsubscribeAll();
+
+
+## <a id="vantiq-upload"></a> Vantiq.upload
+
+The `upload` method performs a upload of a file into an `ArsDocument` resource.
+
+### Signature
+
+    var promise = vantiq.upload(file, contentType, documentPath)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+file | File | Yes | The full path to the file to be uploaded
+contentType | String | Yes | The MIME type of the uploaded file (e.g. "image/jpeg")
+String | documentPath | Yes | The "path" of the ArsDocument in Vantiq (e.g. "assets/myDocument.txt")
+
+### Returns
+
+The `upload` method returns a promiise that resolves to the `ArsDocument` object containing 
+information about the uploaded file.  In particular, the response will contain:
+
+Name | Type | Description
+:--: | :--: | -----------
+name | String | The document path (e.g. "assets/myDocument.txt")
+fileType | String | The MIME type of the uploaded file (e.g. "image/jpeg")
+content | String | This provides the URI path to download the content.  This is used in the [download](#vantiq-download) method.
+
+### Example
+
+The following uploads a text file and prints out the resulting `ArsDocument`:
+
+    var file = '/path/to/file/myFile.txt';
+    vantiq.upload('/path/to/file/myFile.txt', 'text/plain', 'assets/myFile.txt')
+        .then((result) => {
+            console.log(JSON.stringify(result, null, 2));
+        });
+
+
+## <a id="vantiq-download"></a> Vantiq.download
+
+The `download` method pulls down the content of the specified file that was previously 
+uploaded.  The result is streamed to the client.
+
+### Signature
+
+    var promise = vantiq.download(path)
+
+### Parameters
+
+Name | Type | Required | Description
+:--: | :--: | :------:| -----------
+path | String | Yes | This is the path of the file and is specified in the `content` field in the `ArsDocument` associated with the file in Vantiq.
+
+### Returns
+
+The `download` returns a promise that resolves to the HTTP response object that implements
+the `Readable` stream API.
+
+### Example
+
+Downloads the file and prints the contents to the console:
+
+    vantiq.download('/docs/assets/myFile.txt')
+        .then((resp) => {
+            console.log('Content-Type: ' + resp.headers['content-type']);
+            resp.on('data', (chunk) => { console.log(chunk.toString()); });
+            resp.on('error',  (err) => { console.error(err); });
+        });
+
+Downloads the file and streams the contents to a newly created file:
+
+    vantiq.download('/docs/assets/myFile.txt')
+        .then((resp) => {
+            var writer = fs.createWriteStream('myFile.txt');
+            resp.pipe(writer);
+        });
+
 
 # <a id="error"></a> Error
 

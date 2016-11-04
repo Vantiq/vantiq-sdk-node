@@ -10,6 +10,7 @@
     "test": "test"
   },
   "dependencies": {
+    "node-uuid": "^1.4.7",
     "sockjs-client": "^1.1.1",
     "vorpal": "~1.10.9"
   },

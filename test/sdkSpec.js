@@ -2,6 +2,7 @@
 // Vantiq SDK Unit Tests
 //
 var Vantiq     = require('../lib/sdk');
+var path       = require('path');
 var nock       = require('nock');
 var chai       = require('chai');
 chai.use(require('chai-as-promised'));
@@ -113,7 +114,15 @@ describe('Vantiq API', function() {
         });
 
         it('Vantiq.subscribe can prevent unauthorized tests', function() {
-            return authCheck(v.subscribe('topics', '/test/topic', () => {}), {});
+            return authCheck(v.subscribe('topics', '/test/topic', () => {}));
+        });
+
+        it('Vantiq.upload can prevent unauthorized tests', function() {
+            return authCheck(v.upload('file', 'text/plain', 'docPath'));
+        });
+
+        it('Vantiq.download can prevent unauthorized tests', function() {
+            return authCheck(v.download('path'));
         });
     });
 
@@ -426,7 +435,50 @@ describe('Vantiq API', function() {
                     });
             });
         });
-    });
 
+        it('can detect an invalid session on upload', function() {
+            n.get('/api/v1/_status').reply(401);
+
+            return p.then(function() {
+                return v.upload('testFile.txt', 'text/plain', 'assets/testFile.txt')
+                    .catch((err) => {
+                        err.statusCode.should.equal(401);
+                    });
+            });
+        });
+
+        it('can upload a file', function() {
+            var uploadRequest;
+            n.get('/api/v1/_status').reply(200)
+                .post('/api/v1/resources/documents')
+                    .reply(200, function(uri, body) {
+                        uploadRequest = this.req;
+                        return {
+                            name: 'assets/testFile.txt',
+                            contentType: 'text/plain',
+                            content: '/docs/assets/testFile.txt'
+                        };
+                    });
+
+            var testPath = path.dirname(this.test.file) + '/resources/testFile.txt';
+            var testFile = path.basename(testPath);
+            var testDocPath = 'assets/' + testFile;
+
+            return p.then(function() {
+                return v.upload(testPath, 'text/plain', testDocPath)
+                    .then((result) => {
+                        // Verify request
+                        uploadRequest.path.should.equal('/api/v1/resources/documents');
+                        uploadRequest.headers['content-type'].should.match(/^multipart\/form-data; boundary=/);
+
+                        // Verify result
+                        result.name.should.equal('assets/testFile.txt');
+                        result.contentType.should.equal('text/plain');
+                        result.content.should.equal('/docs/assets/testFile.txt');
+                    });
+            });
+        });
+
+    });
 
 });
