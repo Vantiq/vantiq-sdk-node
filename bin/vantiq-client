@@ -4,8 +4,11 @@
 // Command Line Interface Application for Vantiq SDK
 //
 var fs     = require('fs');
+var path   = require('path');
+var stream = require('stream');
 var vorpal = require('vorpal')();
 var Vantiq = require('../index');
+var mime   = require('mime');
 
 //
 // Instance of the SDK
@@ -284,6 +287,53 @@ vorpal
     .action(ensureConnected(function(args, cb) {
         vantiq.unsubscribeAll();
         cb();
+    }));
+
+vorpal
+    .command('upload <filePath> [documentPath] [contentType]')
+    .description('Uploads the given file.  If no documentPath is given, the base filename is used.  If no contentType is given, it is determined via node-mime.')
+    .action(ensureConnected(function(args, cb) {
+        var contentType = args.contentType;
+        if(!contentType) {
+            contentType = mime.lookup(args.filePath);
+        }
+        var documentPath = args.documentPath;
+        if(!documentPath) {
+            documentPath = path.basename(args.filePath);
+        }
+        return vantiq.upload(args.filePath, contentType, documentPath)
+            .then((result) => {
+                this.log(JSON.stringify(result, null, 2));
+                cb();
+            })
+            .catch((err) => {
+                this.log(err);
+                cb();
+            });
+    }));
+
+vorpal
+    .command('download <contentPath> [filePath]')
+    .description('Download the given file.  If no filePath is specified, the file is printed to the console.')
+    .action(ensureConnected(function(args, cb) {
+        return vantiq.download(args.contentPath)
+            .then((result) => {
+                if(args.filePath) {
+                    result.pipe(fs.createWriteStream(args.filePath));
+                } else {
+                    var vorpalStream = new stream.Writable();
+                    vorpalStream._write = (chunk, encoding, done) => {
+                        this.log(chunk.toString());
+                        done();
+                    };
+                    result.pipe(vorpalStream);
+                }
+                cb();
+            })
+            .catch((err) => {
+                this.log(err);
+                cb();
+            });
     }));
 
 //
