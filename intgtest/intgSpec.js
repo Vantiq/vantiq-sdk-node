@@ -65,7 +65,7 @@ describe('Vantiq SDK Integration Tests', function() {
     it('can select data with sorting', function() {
         return v.select('types', [ '_id', 'name' ], {}, { name: -1 })
             .then((result) => {
-                result[0].name.localeCompare(result[1].name).should.equal(1);
+                result[0].name.localeCompare(result[result.length-1].name).should.equal(1);
             });
     });
 
@@ -325,7 +325,8 @@ describe('Vantiq SDK Integration Tests', function() {
         });
     });
 
-    it('can subscribe to a source event', function() {
+    // Run this test only when the JSONPlaceholder source is loaded and active
+    it.skip('can subscribe to a source event', function() {
         this.timeout(10000);
 
         var resp = null;

@@ -3,7 +3,7 @@
 The Vantiq API provide an API for interacting with the Vantiq server.  Each
 API returns a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) that provides the results or errors from the API call.
 
-This document defines the Vantiq Client SDK.  Please refer to the [Vantiq Reference Guides](https://dev.vantiq.com/docs/api/developer.html) for details on the how to use the Vantiq system.
+This document defines the Vantiq Client SDK.  Please refer to the [Vantiq Reference Guides](https://dev.vantiq.com/docs/system/index.html) for details on the how to use the Vantiq system.
 
 ## Vantiq API
 
@@ -69,7 +69,7 @@ The SDK expects that the first operation is to authenticate onto the
 specified Vantiq server.  After successfully authenticated, the client
 is free to issue any requests to the Vantiq server.
 
-This class exposes the [Vantiq RESTful API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).  The `Vantiq` class is provided by the `vantiq-sdk` NPM module.
+This class exposes the [Vantiq REST API](https://dev.vantiq.com/docs/system/api/index.html).  The `Vantiq` class is provided by the `vantiq-sdk` NPM module.
 
 ### Signature
 
@@ -158,7 +158,7 @@ sort | Object | No | Specifies the desired sort for the result set.
 
 The `props` is an array of property names indciating which properties should be returned.
     
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/api/developer.html#api-operations).
+The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
 
 The `sort` is an object with keys that are the properties to sort on and the 
 values indicate ascending (1) or descending (-1).
@@ -245,7 +245,7 @@ Name | Type | Required | Description
 resource | String | Yes | The resource to query
 where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
 
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/api/developer.html#api-operations).
+The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
 
 ### Returns
 
@@ -392,7 +392,7 @@ Name | Type | Required | Description
 resource | String | Yes | The resource to remove
 where | Object | Yes | Specifies which records to remove
 
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/api/developer.html#api-operations).
+The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
 
 ### Returns
 
@@ -484,7 +484,7 @@ payload  | Object | Yes | For topics, the payload is the message to send.  For s
 
 For sources, the parameters required are source specific and are the same as those required
 when performing a `PUBLISH ... TO SOURCE ... USING params`.  Please refer to the specific source definition
-documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/api/index.html).
+documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/system/api/index.html).
 
 ### Returns
 
@@ -580,7 +580,7 @@ params | Object | No | An object that holds the parameters
 
 The parameters required are source specific and are the same as those required
 when performing a `SELECT ... FROM SOURCE ... WITH params`.  Please refer to the specific source definition
-documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/api/index.html).
+documentation in the [Vantiq API Documentation](https://dev.vantiq.com/docs/system/api/index.html).
 
 ### Returns
 

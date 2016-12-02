@@ -4,7 +4,7 @@
 
 # Vantiq Node.JS SDK
 
-The [Vantiq](http://www.vantiq.com) NodeJS SDK is JavaScript library that provides an API into a Vantiq system for NodeJS applications.  The SDK connects to a Vantiq system using the [Vantiq REST API](https://dev.vantiq.com/docs/api/developer.html#api-reference-guide).
+The [Vantiq](http://www.vantiq.com) NodeJS SDK is JavaScript library that provides an API into a Vantiq system for NodeJS applications.  The SDK connects to a Vantiq system using the [Vantiq REST API](https://dev.vantiq.com/docs/system/api/index.html).
 
 ## Installation
 
