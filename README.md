@@ -49,7 +49,7 @@ As an example application, this SDK provides a command line interface that exerc
     
 To use this CLI, simply run the `vantiq-client` command.  The `help` command will provide help on what can be done through the CLI:
 
-    Vantiq NodeJS SDK v1.0.4
+    Vantiq NodeJS SDK v1.0.5
     > help
 
       Commands:
