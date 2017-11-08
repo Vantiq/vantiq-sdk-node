@@ -147,7 +147,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a select query', function() {
-            n.get('/api/v1/resources/MyType')
+            n.get('/api/v1/resources/custom/MyType')
                 .reply(200, [
                     { a: 1, b: 'bingo' },
                     { a: 2, b: 'jenga' }
@@ -163,7 +163,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a select query with constraints', function() {
-            n.get('/api/v1/resources/MyType')
+            n.get('/api/v1/resources/custom/MyType')
                 .query({
                     props: '["_id","b"]',
                     where: '{"a":1}',
@@ -183,7 +183,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a selectOne', function() {
-            n.get('/api/v1/resources/MyType/abc')
+            n.get('/api/v1/resources/custom/MyType/abc')
                 .reply(200, { 
                     a: 1, 
                     b: 'bingo'
@@ -199,7 +199,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a count query', function() {
-            n.get('/api/v1/resources/MyType')
+            n.get('/api/v1/resources/custom/MyType')
                 .query({ 
                     props: '["_id"]',
                     count: true 
@@ -220,7 +220,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a count query with constraints', function() {
-            n.get('/api/v1/resources/MyType')
+            n.get('/api/v1/resources/custom/MyType')
                 .query({ 
                     count: true, 
                     props: '["_id"]',
@@ -242,7 +242,7 @@ describe('Vantiq API', function() {
         
 
         it('can perform an insert', function() {
-            n.post('/api/v1/resources/MyType')
+            n.post('/api/v1/resources/custom/MyType')
                 .reply(200, function(url, requestBody) {
                     return {
                         request: requestBody
@@ -259,7 +259,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform an update', function() {
-            n.put('/api/v1/resources/MyType/12345')
+            n.put('/api/v1/resources/custom/MyType/12345')
                 .reply(200, function(url, requestBody) {
                     return {
                         request: requestBody
@@ -276,7 +276,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform an upsert', function() {
-            n.post('/api/v1/resources/MyType')
+            n.post('/api/v1/resources/custom/MyType')
                 .query({ upsert: true })
                 .reply(200, function(url, requestBody) {
                     return {
@@ -294,7 +294,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a delete', function() {
-            n.delete('/api/v1/resources/MyType')
+            n.delete('/api/v1/resources/custom/MyType')
                 .query({ count: true, where: '{"a":1}' })
                 .reply(204);
 
@@ -307,7 +307,7 @@ describe('Vantiq API', function() {
         });
 
         it('can perform a deleteOne', function() {
-            n.delete('/api/v1/resources/MyType/abc')
+            n.delete('/api/v1/resources/custom/MyType/abc')
                 .reply(204);
 
             return p.then(function() {

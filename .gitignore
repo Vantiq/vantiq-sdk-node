@@ -38,3 +38,7 @@ jspm_packages
 
 # OSX
 .DS_Store
+
+*.iml
+.gradle
+.idea
