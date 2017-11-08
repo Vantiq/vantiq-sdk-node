@@ -52,7 +52,7 @@ describe('VantiqSession API', function() {
                     v.apiVersion.should.equal(API_VERISON);
                     v.authenticated.should.equal(true);
                     v.accessToken.should.equals(TOKEN);
-                    result.body.headers.authorization.should.equal('Basic ' + new Buffer(USERNAME+':'+PASSWORD).toString('base64'));
+                    ////result.body.headers.authorization.should.equal('Basic ' + new Buffer(USERNAME+':'+PASSWORD).toString('base64'));
                 });
         });
 
@@ -94,7 +94,7 @@ describe('VantiqSession API', function() {
                     return v.get('/resources/types')
                         .then((result) => {
                             result.body.path.should.equal('/api/v1/resources/types')
-                            result.body.headers.authorization.should.equal('Bearer ' + TOKEN);
+                            ////result.body.headers.authorization.should.equal('Bearer ' + TOKEN);
                             v.authenticated.should.equal(true);
                         });
                 });
