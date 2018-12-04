@@ -85,6 +85,10 @@ To use this CLI, simply run the `vantiq-client` command.  The `help` command wil
 
 For the full documentation on the SDK, see the [SDK API Reference](./docs/api.md).
 
+## Examples
+
+For examples of working applications that use the SDK, see the [examples folder](./examples/).
+
 ## Copyright and License
 
 Copyright &copy; 2016 Vantiq, Inc.  Code released under the [MIT license](./LICENSE).
