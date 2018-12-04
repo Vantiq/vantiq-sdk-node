@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test</title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    </head>
+    <body>
+        <div class="container">
+            <h2>VANTIQ Event Catalog</h2>
+            <div class="row">
+                <form action="/credentials" method="post" class="inline">
+                    <input type="hidden" name="sessionId" value="<%= sessionId %>">
+                    <input name="username" type="text" class="ghost-input" placehold="VANTIQ username">
+                    <input name="password" type="password" class="ghost-input" placehold="VANTIQ password">
+                    <input type="submit" class="ghost-button" value="Connect to VANTIQ">
+                </form>
+                <p class="inline">--OR--</p>
+                <form action="/token" method="post" class="inline">
+                    <input type="hidden" name="sessionId" value="<%= sessionId %>">
+                    <input name="token" type="text" class="ghost-input" placehold="VANTIQ Access Token">
+                    <input type="submit" class="ghost-button" value="Use Existing Token">
+                </form>
+            </div>
+            <% if (locals.authenticated && locals.managers && locals.managers.length > 0) { %>
+                <h3>You're now connected to the VANTIQ server</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <td>Manager Namespace</td>
+                            <td>Fetch Events</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for (var i = 0; i < managers.length; i++) { %>
+                            <tr>
+                                <td><%= managers[i].name %></td>
+                                <td>
+                                    <form action="/catalog" method="post">
+                                        <input type="hidden" name="sessionId" value="<%= sessionId %>">
+                                        <input type="hidden" name="manager" value="<%= JSON.stringify(managers[i]) %>">
+                                        <input type="submit" class="btn btn-primary" value="View Catalog">
+                                    </form>
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            <% } else if (!error && manager.length == 0) { %>
+                <h3>Not connected to any managers</h3>
+            <% } else if (error) { %>
+                <h3><%= error %></h3>
+            <% } %>
+        </div>
+    </body>
+</html>
