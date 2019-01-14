@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+</head>
+<body>
+<div class="container">
+    <h2>Register as a Publisher of <%= event.name %></h2>
+    <table>
+        <thead>
+            <td>name</td>
+            <td>description</td>
+            <td>tags</td>
+        </thead>
+        <tbody>
+            <td><%= event.name %></td>
+            <td><%= event.description %></td>
+            <td><%= event.ars_properties.tags %></td>
+        </tbody>
+    </table>
+    <br>
+    <div class="row">
+        <form action="/publish" method="post">
+            <input type="hidden" name="sessionId" value="<%= sessionId %>">
+            <input type="hidden" name="event" value="<%= JSON.stringify(event) %>">
+            <input type="hidden" name="manager" value="<%= JSON.stringify(manager) %>">
+            <input name="localEvent" type="text" class="ghost-input" placehold="Local Event Path">
+            <input type="submit" class="ghost-button" value="Register Publisher">
+        </form>
+    </div>
+</div>
+</body>
+</html>
