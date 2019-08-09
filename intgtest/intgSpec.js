@@ -413,4 +413,88 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
+    // it('can upload and download a jpeg image', function() {
+    //     var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.jpg';
+    //     var testFile = path.basename(testPath);
+    //     var testDocPath = 'assets/' + testFile;
+    //
+    //     return v.upload(testPath, 'image/jpeg', testDocPath, "/resources/images")
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('image/jpeg');
+    //             result.content.should.equal('/pics/assets/' + testFile);
+    //
+    //             return v.selectOne('/images', testDocPath);
+    //         })
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('image/jpeg');
+    //             result.content.should.equal('/pics/assets/' + testFile);
+    //
+    //             return v.download('/pics/assets/' + testFile);
+    //         })
+    //         .then((resp) => {
+    //             var isReadable = (resp instanceof stream.Readable);
+    //             isReadable.should.equal(true);
+    //
+    //             resp.headers['content-type'].should.equal('image/jpeg');
+    //         });
+    // });
+    //
+    // it('can upload and download a png image', function() {
+    //     var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.png';
+    //     var testFile = path.basename(testPath);
+    //     var testDocPath = 'assets/' + testFile;
+    //
+    //     return v.upload(testPath, 'image/png', testDocPath, "/resources/images")
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('image/png');
+    //             result.content.should.equal('/pics/assets/' + testFile);
+    //
+    //             return v.selectOne('/images', testDocPath);
+    //         })
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('image/png');
+    //             result.content.should.equal('/pics/assets/' + testFile);
+    //
+    //             return v.download('/pics/assets/' + testFile);
+    //         })
+    //         .then((resp) => {
+    //             var isReadable = (resp instanceof stream.Readable);
+    //             isReadable.should.equal(true);
+    //
+    //             resp.headers['content-type'].should.equal('image/png');
+    //         });
+    // });
+    //
+    // it('can upload and download a video', function() {
+    //     var testPath = path.dirname(this.test.file) + '/../test/resources/testVideo.mp4';
+    //     var testFile = path.basename(testPath);
+    //     var testDocPath = 'assets/' + testFile;
+    //
+    //     return v.upload(testPath, 'video/mp4', testDocPath, "/resources/videos")
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('video/mp4');
+    //             result.content.should.equal('/vids/assets/' + testFile);
+    //
+    //             return v.selectOne('/videos', testDocPath);
+    //         })
+    //         .then((result) => {
+    //             result.name.should.equal(testDocPath);
+    //             result.fileType.should.equal('video/mp4');
+    //             result.content.should.equal('/vids/assets/' + testFile);
+    //
+    //             return v.download('/vids/assets/' + testFile);
+    //         })
+    //         .then((resp) => {
+    //             var isReadable = (resp instanceof stream.Readable);
+    //             isReadable.should.equal(true);
+    //
+    //             resp.headers['content-type'].should.equal('video/mp4');
+    //         });
+    // });
+
 });

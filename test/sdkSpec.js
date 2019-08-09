@@ -121,6 +121,14 @@ describe('Vantiq API', function() {
             return authCheck(v.upload('file', 'text/plain', 'docPath'));
         });
 
+        it("Vantiq.upload (images) can prevent unauthorized tests", function() {
+            return authCheck((v.upload('file', 'image/jpeg', 'docPath', '/resources/images')))
+        });
+
+        it("Vantiq.upload (videos) can prevent unauthorized tests", function() {
+            return authCheck((v.upload('file', 'video/mp4', 'docPath', '/resources/videos')))
+        });
+
         it('Vantiq.download can prevent unauthorized tests', function() {
             return authCheck(v.download('path'));
         });
@@ -447,6 +455,28 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can detect an invalid session on upload image', function() {
+            n.get('/api/v1/_status').reply(401);
+
+            return p.then(function() {
+                return v.upload('testImage.jpg', 'image/jpeg', 'assets/testImage.jpg', '/resources/images')
+                    .catch((err) => {
+                        err.statusCode.should.equal(401);
+                    });
+            });
+        });
+
+        it('can detect an invalid session on upload video', function() {
+            n.get('/api/v1/_status').reply(401);
+
+            return p.then(function() {
+                return v.upload('testVideo.mp4', 'video/mp4', 'assets/testVideo.mp4',  '/resources/videos')
+                    .catch((err) => {
+                        err.statusCode.should.equal(401);
+                    });
+            });
+        });
+
         it('can upload a file', function() {
             var uploadRequest;
             n.get('/api/v1/_status').reply(200)
@@ -475,6 +505,99 @@ describe('Vantiq API', function() {
                         result.name.should.equal('assets/testFile.txt');
                         result.contentType.should.equal('text/plain');
                         result.content.should.equal('/docs/assets/testFile.txt');
+                    });
+            });
+        });
+
+        it('can upload a jpeg image', function() {
+            var uploadRequest;
+            n.get('/api/v1/_status').reply(200)
+                .post('/api/v1/resources/images')
+                .reply(200, function(uri, body) {
+                    uploadRequest = this.req;
+                    return {
+                        name: 'assets/testImage.jpg',
+                        contentType: 'image/jpeg',
+                        content: '/pics/assets/testImage.jpg'
+                    };
+                });
+
+            var testPath = path.dirname(this.test.file) + '/resources/testImage.jpg';
+            var testFile = path.basename(testPath);
+            var testDocPath = 'assets/' + testFile;
+
+            return p.then(function() {
+                return v.upload(testPath, 'image/jpeg', testDocPath, "/resources/images")
+                    .then((result) => {
+                        // Verify request
+                        uploadRequest.path.should.equal('/api/v1/resources/images');
+
+                        // Verify result
+                        result.name.should.equal('assets/testImage.jpg');
+                        result.contentType.should.equal('image/jpeg');
+                        result.content.should.equal('/pics/assets/testImage.jpg');
+                    });
+            });
+        });
+
+        it('can upload a png image', function() {
+            var uploadRequest;
+            n.get('/api/v1/_status').reply(200)
+                .post('/api/v1/resources/images')
+                .reply(200, function(uri, body) {
+                    uploadRequest = this.req;
+                    return {
+                        name: 'assets/testImage.png',
+                        contentType: 'image/png',
+                        content: '/pics/assets/testImage.png'
+                    };
+                });
+
+            var testPath = path.dirname(this.test.file) + '/resources/testImage.png';
+            var testFile = path.basename(testPath);
+            var testDocPath = 'assets/' + testFile;
+
+            return p.then(function() {
+                return v.upload(testPath, 'image/png', testDocPath, "/resources/images")
+                    .then((result) => {
+                        // Verify request
+                        uploadRequest.path.should.equal('/api/v1/resources/images');
+
+                        // Verify result
+                        result.name.should.equal('assets/testImage.png');
+                        result.contentType.should.equal('image/png');
+                        result.content.should.equal('/pics/assets/testImage.png');
+                    });
+            });
+        });
+
+        it('can upload a video', function() {
+            var uploadRequest;
+            n.get('/api/v1/_status').reply(200)
+                .post('/api/v1/resources/videos')
+                .reply(200, function(uri, body) {
+                    uploadRequest = this.req;
+                    return {
+                        name: 'assets/testVideo.mp4',
+                        contentType: 'video/mp4',
+                        content: '/vids/assets/testVideo.mp4'
+                    };
+                });
+
+            var testPath = path.dirname(this.test.file) + '/resources/testVideo.mp4';
+            var testFile = path.basename(testPath);
+            var testDocPath = 'assets/' + testFile;
+
+            return p.then(function() {
+                return v.upload(testPath, 'video/mp4', testDocPath, "/resources/videos")
+                    .then((result) => {
+                        // Verify request
+                        uploadRequest.path.should.equal('/api/v1/resources/videos');
+
+                        // Verify result
+                        result.name.should.equal('assets/testVideo.mp4');
+                        result.contentType.should.equal('video/mp4');
+                        result.content.should.equal('/vids/assets/testVideo.mp4');
                     });
             });
         });
