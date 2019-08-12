@@ -290,8 +290,8 @@ vorpal
     }));
 
 vorpal
-    .command('upload <filePath> [documentPath] [contentType]')
-    .description('Uploads the given file.  If no documentPath is given, the base filename is used.  If no contentType is given, it is determined via node-mime.')
+    .command('upload <filePath> [documentPath] [contentType] [resourcePath]')
+    .description('Uploads the given file.  If no documentPath is given, the base filename is used.  If no contentType is given, it is determined via node-mime. If no resourcePath is given, file will be uploaded as VANTIQ Document.')
     .action(ensureConnected(function(args, cb) {
         var contentType = args.contentType;
         if(!contentType) {
@@ -301,15 +301,27 @@ vorpal
         if(!documentPath) {
             documentPath = path.basename(args.filePath);
         }
-        return vantiq.upload(args.filePath, contentType, documentPath)
-            .then((result) => {
-                this.log(JSON.stringify(result, null, 2));
-                cb();
-            })
-            .catch((err) => {
-                this.log(err);
-                cb();
-            });
+        var resourcePath = args.resourcePath;
+        if(!resourcePath) {
+            return vantiq.upload(args.filePath, contentType, documentPath)
+                .then((result) => {
+                    this.log(JSON.stringify(result, null, 2));
+                    cb();
+                })
+                .catch((err) => {
+                    this.log(err);
+                    cb();
+                });
+        } else
+            return vantiq.upload(args.filePath, contentType, documentPath, resourcePath)
+                .then((result) => {
+                    this.log(JSON.stringify(result, null, 2));
+                    cb();
+                })
+                .catch((err) => {
+                    this.log(err);
+                    cb();
+                });
     }));
 
 vorpal
