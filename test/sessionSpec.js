@@ -132,6 +132,14 @@ describe('VantiqSession API', function() {
             return authCheck(v.upload('/resources/documents', 'somefile', 'text/plain', 'somefile'));
         });
 
+        it('VantiqSession.upload (images) can prevent unauthorized tests', function() {
+            return authCheck(v.upload('/resources/images', 'somefile', 'text/plain', 'somefile'));
+        });
+
+        it('VantiqSession.upload (videos) can prevent unauthorized tests', function() {
+            return authCheck(v.upload('/resources/videos', 'somefile', 'text/plain', 'somefile'));
+        });
+
         it('VantiqSession.download can prevent unauthorized tests', function() {
             return authCheck(v.download('somefile'));
         });

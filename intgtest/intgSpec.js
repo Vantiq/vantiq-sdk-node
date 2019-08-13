@@ -8,12 +8,11 @@
 // this test:
 //
 //   SERVER:   Vantiq server URL (e.g. http://localhost:8080)
-//   USERNAME: Vantiq username for the namespace with project artifacts
-//   PASSWORD: Vantiq password
+//   AUTHTOKEN: Vantiq access token for the namespace with project artifacts
 //
 // E.g.
 //
-// % env SERVER=... USERNAME=... PASSWORD=... mocha intgSpec.js
+// % env SERVER=... AUTHTOKEN=... mocha intgSpec.js
 //
 
 var Vantiq     = require('../lib/sdk');
@@ -25,13 +24,11 @@ chai.use(require('chai-things'));
 var should     = chai.should();
 
 var SERVER   = process.env.SERVER;
-var USERNAME = process.env.USERNAME;
-var PASSWORD = process.env.PASSWORD;
+var AUTHTOKEN = process.env.AUTHTOKEN;
 
-if(!SERVER || !USERNAME || !PASSWORD) {
+if(!SERVER || !AUTHTOKEN) {
     if(!SERVER)   console.error("Vantiq server URL not specified in SERVER environment variable");
-    if(!USERNAME) console.error("Vantiq username not specified in USERNAME environment variable");
-    if(!PASSWORD) console.error("Vantiq password not specified in PASSWORD environment variable");
+    if(!AUTHTOKEN) console.error("Vantiq access token not specified in AUTHTOKEN environment variable");
     process.exit(1);
 }
 
@@ -44,18 +41,18 @@ describe('Vantiq SDK Integration Tests', function() {
     var v;
     before(function() {
         v = new Vantiq({ server: SERVER, apiVersion: 1 });
-        return v.authenticate(USERNAME, PASSWORD);
+        return v.session.accessToken = AUTHTOKEN;
     });
 
     it('can select data with no constraints', function() {
-        return v.select('types')
+        return v.select('system.types')
             .then((result) => {
                 result.should.include.one.with.property('name', 'TestType');
             });
     });
 
     it('can select data with constraints', function() {
-        return v.select('types', [ '_id', 'name' ], { name: 'TestType' })
+        return v.select('system.types', [ '_id', 'name' ], { name: 'TestType' })
             .then((result) => {
                 result.length.should.equal(1);
                 result[0].should.have.property('name', 'TestType');
@@ -63,14 +60,14 @@ describe('Vantiq SDK Integration Tests', function() {
     });
 
     it('can select data with sorting', function() {
-        return v.select('types', [ '_id', 'name' ], {}, { name: -1 })
+        return v.select('system.types', [ '_id', 'name' ], {}, { name: -1 })
             .then((result) => {
                 result[0].name.localeCompare(result[result.length-1].name).should.equal(1);
             });
     });
 
     it('can selectOne', function() {
-        return v.selectOne('types', 'TestType')
+        return v.selectOne('system.types', 'TestType')
             .then((result) => {
                 result.should.have.property('name', 'TestType');
             });
@@ -79,11 +76,11 @@ describe('Vantiq SDK Integration Tests', function() {
     it('can count data with no constraints', function() {
         var count = 0;
         // Select types
-        return v.select('types', [ '_id' ])
+        return v.select('system.types', [ '_id' ])
             .then((result) => {
                 // Remember size of data set and run count
                 count = result.length;
-                return v.count('types');
+                return v.count('system.types');
             })
             .then((result) => {
                 // Ensure count matches initial select
@@ -92,7 +89,7 @@ describe('Vantiq SDK Integration Tests', function() {
     });
 
     it('can count data with constraints', function() {
-        return v.count('types', { name: 'TestType' })
+        return v.count('system.types', { name: 'TestType' })
             .then((result) => {
                 result.should.equal(1);
             });
@@ -299,13 +296,6 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    it('can evaluate an analytics model', function() {
-        return v.evaluate('TestModel', { value: 4.0 })
-            .then((result) => {
-                result.should.equal(2.0);
-            });
-    });
-
     it('can subscribe to a publish event', function() {
         var resp = null;
         return v.subscribe('topics', '/test/topic', (r) => {
@@ -326,7 +316,7 @@ describe('Vantiq SDK Integration Tests', function() {
     });
 
     // Run this test only when the JSONPlaceholder source is loaded and active
-    it.skip('can subscribe to a source event', function() {
+    it('can subscribe to a source event', function() {
         this.timeout(10000);
 
         var resp = null;
@@ -383,7 +373,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 result.fileType.should.equal('text/plain');
                 result.content.should.equal('/docs/assets/' + testFile);
 
-                return v.selectOne('/documents', testDocPath);
+                return v.selectOne('system.documents', testDocPath);
             })
             .then((result) => {
                 result.name.should.equal(testDocPath);
@@ -410,6 +400,90 @@ describe('Vantiq SDK Integration Tests', function() {
             })
             .then((result) => {
                 result.should.equal('This is a test file used for mock and integration unit testing.\n');
+            });
+    });
+
+    it('can upload and download a jpeg image', function() {
+        var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.jpg';
+        var testFile = path.basename(testPath);
+        var testDocPath = 'assets/' + testFile;
+
+        return v.upload(testPath, 'image/jpeg', testDocPath, "/resources/images")
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('image/jpeg');
+                result.content.should.equal('/pics/assets/' + testFile);
+
+                return v.selectOne('system.images', testDocPath);
+            })
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('image/jpeg');
+                result.content.should.equal('/pics/assets/' + testFile);
+
+                return v.download('/pics/assets/' + testFile);
+            })
+            .then((resp) => {
+                var isReadable = (resp instanceof stream.Readable);
+                isReadable.should.equal(true);
+
+                resp.headers['content-type'].should.equal('image/jpeg');
+            });
+    });
+
+    it('can upload and download a png image', function() {
+        var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.png';
+        var testFile = path.basename(testPath);
+        var testDocPath = 'assets/' + testFile;
+
+        return v.upload(testPath, 'image/png', testDocPath, "/resources/images")
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('image/png');
+                result.content.should.equal('/pics/assets/' + testFile);
+
+                return v.selectOne('system.images', testDocPath);
+            })
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('image/png');
+                result.content.should.equal('/pics/assets/' + testFile);
+
+                return v.download('/pics/assets/' + testFile);
+            })
+            .then((resp) => {
+                var isReadable = (resp instanceof stream.Readable);
+                isReadable.should.equal(true);
+
+                resp.headers['content-type'].should.equal('image/png');
+            });
+    });
+
+    it('can upload and download a video', function() {
+        var testPath = path.dirname(this.test.file) + '/../test/resources/testVideo.mp4';
+        var testFile = path.basename(testPath);
+        var testDocPath = 'assets/' + testFile;
+
+        return v.upload(testPath, 'video/mp4', testDocPath, "/resources/videos")
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('video/mp4');
+                result.content.should.equal('/vids/assets/' + testFile);
+
+                return v.selectOne('system.videos', testDocPath);
+            })
+            .then((result) => {
+                result.name.should.equal(testDocPath);
+                result.fileType.should.equal('video/mp4');
+                result.content.should.equal('/vids/assets/' + testFile);
+
+                return v.download('/vids/assets/' + testFile);
+            })
+            .then((resp) => {
+                var isReadable = (resp instanceof stream.Readable);
+                isReadable.should.equal(true);
+
+                resp.headers['content-type'].should.equal('video/mp4');
             });
     });
 

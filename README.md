@@ -54,32 +54,33 @@ To use this CLI, simply run the `vantiq-client` command.  The `help` command wil
 
       Commands:
 
-        help [command...]                               Provides help for a given command.
-        exit                                            Exits application.
-        connect <server> <username> <password>          Connects to the specified server with the given credentials.
-        connect-token <server> <accessToken>            Connects to the specified server using the given access token.
-        access-token                                    Prints out the current access token.
-        select <type> [props] [where] [sort]            Selects data for a given type with optional constraints in JSON form
-        selectOne <type> <id>                           Selects a single record using the given id
-        count <type> [where]                            Counts the number of records for a given type with where clause in JSON
-                                                        form
-        insert <type> <file>                            Inserts one or more records into the given type using the given JSON file
-        update <type> <key> <file>                      Updates the given record identified by the key for the given type using
-                                                        the given JSON file
-        upsert <type> <file>                            Inserts or updates the given record for the given type using the given
-                                                        JSON file
-        delete <type> <where>                           Deletes one or more records identified by the given constraint
-        deleteOne <type> <id>                           Deletes a single record with the given id
-        publish <topic> <file>                          Publishes a message in the given file onto the given topic
-        execute <procedure> [params]                    Executes the named procedure with optional arguments in JSON form
-        evaluate <analyticsModel> [params]              Evaluates the named analytics model with input parameters as a JSON object
-        query <source> [params]                         Queries the named source with the given parameters in JSON form
-        subscribe <resource> <name> [operation]         Subscribe to events listening in real-time
-        unsubscribe                                     Unsubscribes to all events and closes the WebSocket
-        upload <filePath> [documentPath] [contentType]  Uploads the given file.  If no documentPath is given, the base filename is
-                                                        used.  If no contentType is given, it is determined via node-mime.
-        download <contentPath> [filePath]               Download the given file.  If no filePath is specified, the file is printed
-                                                        to the console.
+        help [command...]                                               Provides help for a given command.
+        exit                                                            Exits application.
+        connect <server> <username> <password>                          Connects to the specified server with the given credentials.
+        connect-token <server> <accessToken>                            Connects to the specified server using the given access token.
+        access-token                                                    Prints out the current access token.
+        select <type> [props] [where] [sort]                            Selects data for a given type with optional constraints in JSON form
+        selectOne <type> <id>                                           Selects a single record using the given id
+        count <type> [where]                                            Counts the number of records for a given type with where clause in JSON
+                                                                        form
+        insert <type> <file>                                            Inserts one or more records into the given type using the given JSON file
+        update <type> <key> <file>                                      Updates the given record identified by the key for the given type using
+                                                                        the given JSON file
+        upsert <type> <file>                                            Inserts or updates the given record for the given type using the given
+                                                                        JSON file
+        delete <type> <where>                                           Deletes one or more records identified by the given constraint
+        deleteOne <type> <id>                                           Deletes a single record with the given id
+        publish <topic> <file>                                          Publishes a message in the given file onto the given topic
+        execute <procedure> [params]                                    Executes the named procedure with optional arguments in JSON form
+        evaluate <analyticsModel> [params]                              Evaluates the named analytics model with input parameters as a JSON object
+        query <source> [params]                                         Queries the named source with the given parameters in JSON form
+        subscribe <resource> <name> [operation]                         Subscribe to events listening in real-time
+        unsubscribe                                                     Unsubscribes to all events and closes the WebSocket
+        upload <filePath> [documentPath] [contentType] [resourcePath]   Uploads the given file. If no documentPath is given, the base filename is
+                                                                        used. If no contentType is given, it is determined via node-mime. If no
+                                                                        resourcePath is given, file will be uploaded as VANTIQ Document.
+        download <contentPath> [filePath]                               Download the given file. If no filePath is specified, the file is printed
+                                                                        to the console.
 
 ## Documentation
 
