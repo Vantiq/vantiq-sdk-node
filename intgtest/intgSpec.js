@@ -267,7 +267,7 @@ describe('Vantiq SDK Integration Tests', function() {
         };
 
         // Insert message
-        return v.publish('topics', '/test/topic/2', message)
+        return v.publish('topics', '/test/topic3', message)
             .then((result) => {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
@@ -311,7 +311,7 @@ describe('Vantiq SDK Integration Tests', function() {
         })
         .then(function() {
             should.exist(resp);
-            resp.headers['X-Request-Id'].should.equal('/topics//test/topic');
+            resp.headers['X-Request-Id'].should.equal('/topics/test/topic');
           //  resp.body.value.foo.should.equal('bar');
         });
     });
@@ -505,7 +505,7 @@ describe('Vantiq SDK Integration Tests', function() {
                     // Ensure record was inserted
                     result.length.should.equal(1)
                     //Create a persistent subscription to the reliableTopic
-                }).then( v.subscribePersistent('topics', '/reliableTopic',  {persistent: true}, (r) => {
+                }).then( v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
                     resp = r;
                     if (r.body.subscriptionId !== undefined) {
                         subscriptionId = r.body.subscriptionId;
@@ -554,7 +554,7 @@ describe('Vantiq SDK Integration Tests', function() {
                             return v.select('ArsSubscription', [], {_id: subscriptionId})
                     }).then((result) => {
                             result.length.should.equal(1)
-                    }).then( v.subscribePersistent('topics', '/reliableTopic', 
+                    }).then( v.subscribe('topics', '/reliableTopic', 
                                 {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
                         //Re-establish the same connection to the same subscription
                                 resp = r;
@@ -591,7 +591,7 @@ describe('Vantiq SDK Integration Tests', function() {
             return v.select('system.topics', [], {name: "/reliableTopic/ack"}).then((result) => {
                 // Ensure topic was inserted
                 result.length.should.equal(1)
-            }).then( v.subscribePersistent('topics', '/reliableTopic/ack',  {persistent: true}, (r) => {
+            }).then( v.subscribe('topics', '/reliableTopic/ack',  {persistent: true}, (r) => {
                 resp = r;
                 if (r.body.subscriptionId !== undefined) {
                     subscriptionId = r.body.subscriptionId;
