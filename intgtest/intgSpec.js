@@ -267,7 +267,7 @@ describe('Vantiq SDK Integration Tests', function() {
         };
 
         // Insert message
-        return v.publish('topics', '/test/topic', message)
+        return v.publish('topics', '/test/topic/2', message)
             .then((result) => {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
@@ -500,10 +500,11 @@ describe('Vantiq SDK Integration Tests', function() {
         };
         return v.insert('system.topics', topic)
             .then((result) => {
-                // Select record back
+                // Find the nearly inserted reliable topic
                 return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
                     // Ensure record was inserted
                     result.length.should.equal(1)
+                    //Create a persistent subscription to the reliableTopic
                 }).then( v.subscribePersistent('topics', '/reliableTopic',  {persistent: true}, (r) => {
                     resp = r;
                     if (r.body.subscriptionId !== undefined) {
@@ -513,12 +514,13 @@ describe('Vantiq SDK Integration Tests', function() {
                         // Delay a bit to allow for event processing
                         return new Promise((resolve) => setTimeout(resolve, 500));
                 }).then(function() {
-                // Select record back
+                // Select ArsSubscription to ensure the persistent subscription was made
                     return v.select('ArsSubscription', [], {_id: subscriptionId}).then((result) => {
                         // Ensure record was inserted
                         result.length.should.equal(1)
                     })
                     }).then(function() {
+                        //Publish to reliable topic
                         return v.publish('topics', '/reliableTopic', { foo: 'bar' });
                     }).then(function() {
                         // Delay a bit to allow for event processing
@@ -526,6 +528,7 @@ describe('Vantiq SDK Integration Tests', function() {
                     })
                     .then(function() {
                         should.exist(resp);
+                        //Ensure receipt of event
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
                 }).then(function() {
@@ -533,6 +536,7 @@ describe('Vantiq SDK Integration Tests', function() {
                         return new Promise((resolve) => setTimeout(resolve, 2000));
                     })
                     .then(function() {
+                        //Ensure we get the event redelivered
                         should.exist(resp);
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
@@ -546,24 +550,23 @@ describe('Vantiq SDK Integration Tests', function() {
                             // Ensure record was inserted
                             result.length.should.equal(1)
                     }).then(function() {
-                                //Close the connection
-                                v.unsubscribeAll();
-                    }).then(function() {
-                                // Make sure the persistent subscription was not deleted
-                                return v.select('ArsSubscription', [], {_id: subscriptionId})
+                            // Make sure the persistent subscription was not deleted
+                            return v.select('ArsSubscription', [], {_id: subscriptionId})
                     }).then((result) => {
-                            // Ensure record was inserted
                             result.length.should.equal(1)
-                    }).then( v.subscribePersistent('topics', '/reliableTopic', {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                    }).then( v.subscribePersistent('topics', '/reliableTopic', 
+                                {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                        //Re-establish the same connection to the same subscription
                                 resp = r;
                                 if (r.body.subscriptionId !== undefined) {
                                     subscriptionId.should.equal(r.body.subscriptionId);
                                 }
                     })).then(function() {
-                                // Delay a bit to allow for event processing
-                                return new Promise((resolve) => setTimeout(resolve, 2000));
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 2000));
                     })
                     .then(function() {
+                        //Ensure we are still receiving messages on that topic
                         should.exist(resp);
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
@@ -575,60 +578,55 @@ describe('Vantiq SDK Integration Tests', function() {
     it('acknowledge a reliable message', function() {
         var resp = null;
         var subscriptionId = null;
-        var isAcked = false;
         var topic = {
-            name: '/reliableTopic',
+            name: '/reliableTopic/ack',
             description: "The reliable topic",
             isReliable: true,
             redeliveryFrequency: 1,
             redeliveryTTL: 25
         };
-        
-    
-        
+        //Insert reliable topic
         return v.insert('system.topics', topic)
             .then((result) => {
-                // Select record back
-            return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
-                // Ensure record was inserted
+            return v.select('system.topics', [], {name: "/reliableTopic/ack"}).then((result) => {
+                // Ensure topic was inserted
                 result.length.should.equal(1)
-            }).then( v.subscribePersistent('topics', '/reliableTopic',  {persistent: true}, (r) => {
+            }).then( v.subscribePersistent('topics', '/reliableTopic/ack',  {persistent: true}, (r) => {
                 resp = r;
                 if (r.body.subscriptionId !== undefined) {
                     subscriptionId = r.body.subscriptionId;
-                }
-                if (r.body.ack !== undefined) {
-                    isAcked = r.body.ack;
                 }
             })).then(function() {
                     // Delay a bit to allow for event processing
                     return new Promise((resolve) => setTimeout(resolve, 500));
             }).then(function() {
-                // Select record back
+                // Select persistent subscription record
                 return v.select('ArsSubscription', [], {_id: subscriptionId})
             }).then((result) => {
                         // Ensure record was inserted
                 result.length.should.equal(1)
             }).then(function() {
-                return v.publish('topics', '/reliableTopic', { foo: 'bar' });
+                return v.publish('topics', '/reliableTopic/ack', { foo: 'bar' });
             }).then(function() {
                 // Delay a bit to allow for event processing
                 return new Promise((resolve) => setTimeout(resolve, 500));
             }).then(function() {
                 should.exist(resp);
-                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic/ack');
                 resp.body.value.foo.should.equal('bar');
             }).then(function() {
-                        // Delay a bit to allow for event processing
+                // Delay a bit to allow for the redelivery TTL
                 return new Promise((resolve) => setTimeout(resolve, 2000));
             }).then(function() {
+                //Ensure the message was redelivered
                 should.exist(resp);
-                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic/ack');
                 resp.body.value.foo.should.equal('bar');
-                return v.acknowledge(subscriptionId, "/topics/reliableTopic", resp.body);
+                //acknowledge the message
+                return v.acknowledge(subscriptionId, "/topics/reliableTopic/ack", resp.body);
             }).then (function() {
                 // Delay a bit to allow for event processing
-
+                //And then select the Ack in the database
                 this.checkForAck = function() {
                     var where =  {
                         subscriptionId: subscriptionId
