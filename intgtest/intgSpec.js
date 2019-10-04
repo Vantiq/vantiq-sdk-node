@@ -504,7 +504,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
                     // Ensure record was inserted
                     result.length.should.equal(1)
-                }).then( v.subscribePersistent('topics', '/reliableTopic',  (r) => {
+                }).then( v.subscribePersistent('topics', '/reliableTopic',  {persistent: true}, (r) => {
                     resp = r;
                     if (r.body.subscriptionId !== undefined) {
                         subscriptionId = r.body.subscriptionId;
@@ -526,7 +526,7 @@ describe('Vantiq SDK Integration Tests', function() {
                     })
                     .then(function() {
                         should.exist(resp);
-                        resp.headers['X-Request-Id'].should.equal('/topics//reliableTopic');
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
                 }).then(function() {
                         // Delay a bit to allow for event processing
@@ -534,19 +534,42 @@ describe('Vantiq SDK Integration Tests', function() {
                     })
                     .then(function() {
                         should.exist(resp);
-                        resp.headers['X-Request-Id'].should.equal('/topics//reliableTopic');
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
                     }).then(function() {
                         //Close the connection
                         v.unsubscribeAll();
                     }).then(function() {
                         // Make sure the persistent subscription was not deleted
-                        return v.select('ArsSubscription', [], {_id: subscriptionId}).then((result) => {
+                        return v.select('ArsSubscription', [], {_id: subscriptionId})
+                        .then((result) => {
                             // Ensure record was inserted
                             result.length.should.equal(1)
-                        });
+                    }).then(function() {
+                                //Close the connection
+                                v.unsubscribeAll();
+                    }).then(function() {
+                                // Make sure the persistent subscription was not deleted
+                                return v.select('ArsSubscription', [], {_id: subscriptionId})
+                    }).then((result) => {
+                            // Ensure record was inserted
+                            result.length.should.equal(1)
+                    }).then( v.subscribePersistent('topics', '/reliableTopic', {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                                resp = r;
+                                if (r.body.subscriptionId !== undefined) {
+                                    subscriptionId.should.equal(r.body.subscriptionId);
+                                }
+                    })).then(function() {
+                                // Delay a bit to allow for event processing
+                                return new Promise((resolve) => setTimeout(resolve, 2000));
+                    })
+                    .then(function() {
+                        should.exist(resp);
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
                     });
             });
+        });
     });
 
 });
