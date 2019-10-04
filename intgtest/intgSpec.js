@@ -536,6 +536,15 @@ describe('Vantiq SDK Integration Tests', function() {
                         should.exist(resp);
                         resp.headers['X-Request-Id'].should.equal('/topics//reliableTopic');
                         resp.body.value.foo.should.equal('bar');
+                    }).then(function() {
+                        //Close the connection
+                        v.unsubscribeAll();
+                    }).then(function() {
+                        // Make sure the persistent subscription was not deleted
+                        return v.select('ArsSubscription', [], {_id: subscriptionId}).then((result) => {
+                            // Ensure record was inserted
+                            result.length.should.equal(1)
+                        });
                     });
             });
     });
