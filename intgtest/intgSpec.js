@@ -36,7 +36,7 @@ if(!SERVER || !AUTHTOKEN) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
-    this.timeout(5000);
+    this.timeout(20000);
 
     var v;
     before(function() {
@@ -281,7 +281,8 @@ describe('Vantiq SDK Integration Tests', function() {
                 });
             })
             .then((result) => {
-                // Ensure record was inserted
+                // Ensure record was 
+                // inserted
                 result.length.should.equal(1)
                 result[0].should.have.property('k', 42);
             });
@@ -484,6 +485,58 @@ describe('Vantiq SDK Integration Tests', function() {
                 isReadable.should.equal(true);
 
                 resp.headers['content-type'].should.equal('video/mp4');
+            });
+    });
+
+    it('can subscribe to a reliable topic event', function() {
+        var resp = null;
+        var subscriptionId = null;
+        var topic = {
+            name: '/reliableTopic',
+            description: "The reliable topic",
+            isReliable: true,
+            redeliveryFrequency: 1,
+            redeliveryTTL: 25
+        };
+        return v.insert('system.topics', topic)
+            .then((result) => {
+                // Select record back
+                return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
+                    // Ensure record was inserted
+                    result.length.should.equal(1)
+                }).then( v.subscribePersistent('topics', '/reliableTopic',  (r) => {
+                    resp = r;
+                    if (r.body.subscriptionId !== undefined) {
+                        subscriptionId = r.body.subscriptionId;
+                    }
+                })).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 500));
+                }).then(function() {
+                // Select record back
+                    return v.select('ArsSubscription', [], {_id: subscriptionId}).then((result) => {
+                        // Ensure record was inserted
+                        result.length.should.equal(1)
+                    })
+                    }).then(function() {
+                        return v.publish('topics', '/reliableTopic', { foo: 'bar' });
+                    }).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 500));
+                    })
+                    .then(function() {
+                        should.exist(resp);
+                        resp.headers['X-Request-Id'].should.equal('/topics//reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
+                }).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 2000));
+                    })
+                    .then(function() {
+                        should.exist(resp);
+                        resp.headers['X-Request-Id'].should.equal('/topics//reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
+                    });
             });
     });
 
