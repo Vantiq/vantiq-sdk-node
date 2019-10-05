@@ -36,7 +36,7 @@ if(!SERVER || !AUTHTOKEN) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
-    this.timeout(20000);
+    this.timeout(15000);
 
     var v;
     before(function() {
@@ -281,8 +281,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 });
             })
             .then((result) => {
-                // Ensure record was 
-                // inserted
+                // Ensure record was inserted
                 result.length.should.equal(1)
                 result[0].should.have.property('k', 42);
             });
@@ -312,7 +311,7 @@ describe('Vantiq SDK Integration Tests', function() {
         .then(function() {
             should.exist(resp);
             resp.headers['X-Request-Id'].should.equal('/topics/test/topic');
-          //  resp.body.value.foo.should.equal('bar');
+            resp.body.value.foo.should.equal('bar');
         });
     });
 
