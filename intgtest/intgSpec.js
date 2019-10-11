@@ -36,7 +36,7 @@ if(!SERVER || !AUTHTOKEN) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
-    this.timeout(15000);
+    this.timeout(150000000000);
 
     var v;
     before(function() {
@@ -267,7 +267,7 @@ describe('Vantiq SDK Integration Tests', function() {
         };
 
         // Insert message
-        return v.publish('topics', '/test/topic3', message)
+        return v.publish('topics', '/test/topic', message)
             .then((result) => {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
@@ -497,6 +497,7 @@ describe('Vantiq SDK Integration Tests', function() {
             redeliveryFrequency: 1,
             redeliveryTTL: 25
         };
+        var numMessages = 0;
         return v.insert('system.topics', topic)
             .then((result) => {
                 // Find the nearly inserted reliable topic
@@ -508,6 +509,9 @@ describe('Vantiq SDK Integration Tests', function() {
                     resp = r;
                     if (r.body.subscriptionId !== undefined) {
                         subscriptionId = r.body.subscriptionId;
+                    }
+                    if (r.body.value && r.body.value.foo) {
+                        numMessages++;
                     }
                 })).then(function() {
                         // Delay a bit to allow for event processing
@@ -530,6 +534,9 @@ describe('Vantiq SDK Integration Tests', function() {
                         //Ensure receipt of event
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 1) {
+                            numMessages.should.throw("Error")
+                        }
                 }).then(function() {
                         // Delay a bit to allow for event processing
                         return new Promise((resolve) => setTimeout(resolve, 2000));
@@ -539,6 +546,9 @@ describe('Vantiq SDK Integration Tests', function() {
                         should.exist(resp);
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 2) {
+                            resp.should.throw("Err")
+                        }
                     }).then(function() {
                         //Close the connection
                         v.unsubscribeAll();
@@ -547,11 +557,6 @@ describe('Vantiq SDK Integration Tests', function() {
                         return v.select('ArsSubscription', [], {_id: subscriptionId})
                         .then((result) => {
                             // Ensure record was inserted
-                            result.length.should.equal(1)
-                    }).then(function() {
-                            // Make sure the persistent subscription was not deleted
-                            return v.select('ArsSubscription', [], {_id: subscriptionId})
-                    }).then((result) => {
                             result.length.should.equal(1)
                     }).then( v.subscribe('topics', '/reliableTopic', 
                                 {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
@@ -569,6 +574,9 @@ describe('Vantiq SDK Integration Tests', function() {
                         should.exist(resp);
                         resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
                         resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 3) {
+                            resp.should.throw("Err")
+                        }                    
                     });
             });
         });
