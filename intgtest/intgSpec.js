@@ -559,12 +559,12 @@ describe('Vantiq SDK Integration Tests', function() {
                             // Ensure record was inserted
                             result.length.should.equal(1)
                     }).then( v.subscribe('topics', '/reliableTopic', 
-                                {subscriptionName: subscriptionName, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                        {subscriptionName: subscriptionName, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
                         //Re-establish the same connection to the same subscription
-                                resp = r;
-                                if (r.body.subscriptionName !== undefined) {
-                                    subscriptionName.should.equal(r.body.subscriptionName);
-                                }
+                        resp = r;
+                        if (r.body.subscriptionName !== undefined) {
+                            subscriptionName.should.equal(r.body.subscriptionName);
+                        }
                     })).then(function() {
                         // Delay a bit to allow for event processing
                         return new Promise((resolve) => setTimeout(resolve, 3000));
@@ -604,8 +604,8 @@ describe('Vantiq SDK Integration Tests', function() {
                     subscriptionName = r.body.subscriptionName;
                 }
             })).then(function() {
-                    // Delay a bit to allow for event processing
-                    return new Promise((resolve) => setTimeout(resolve, 500));
+                // Delay a bit to allow for event processing
+                return new Promise((resolve) => setTimeout(resolve, 500));
             }).then(function() {
                 // Select persistent subscription record
                 return v.select('ArsSubscription', [], {name: subscriptionName})
