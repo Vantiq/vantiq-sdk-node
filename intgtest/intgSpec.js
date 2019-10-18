@@ -36,7 +36,7 @@ if(!SERVER || !AUTHTOKEN) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
-    this.timeout(150000000000);
+    this.timeout(30000);
 
     var v;
     before(function() {
@@ -489,7 +489,7 @@ describe('Vantiq SDK Integration Tests', function() {
 
     it('can subscribe to a reliable topic event', function() {
         var resp = null;
-        var subscriptionId = null;
+        var subscriptionName = null;
         var topic = {
             name: '/reliableTopic',
             description: "The reliable topic",
@@ -507,8 +507,8 @@ describe('Vantiq SDK Integration Tests', function() {
                     //Create a persistent subscription to the reliableTopic
                 }).then( v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
                     resp = r;
-                    if (r.body.subscriptionId !== undefined) {
-                        subscriptionId = r.body.subscriptionId;
+                    if (r.body.subscriptionName !== undefined) {
+                        subscriptionName = r.body.subscriptionName;
                     }
                     if (r.body.value && r.body.value.foo) {
                         numMessages++;
@@ -518,7 +518,7 @@ describe('Vantiq SDK Integration Tests', function() {
                         return new Promise((resolve) => setTimeout(resolve, 500));
                 }).then(function() {
                 // Select ArsSubscription to ensure the persistent subscription was made
-                    return v.select('ArsSubscription', [], {_id: subscriptionId}).then((result) => {
+                    return v.select('ArsSubscription', [], {name: subscriptionName}).then((result) => {
                         // Ensure record was inserted
                         result.length.should.equal(1)
                     })
@@ -554,20 +554,20 @@ describe('Vantiq SDK Integration Tests', function() {
                         v.unsubscribeAll();
                     }).then(function() {
                         // Make sure the persistent subscription was not deleted
-                        return v.select('ArsSubscription', [], {_id: subscriptionId})
+                        return v.select('ArsSubscription', [], {name: subscriptionName})
                         .then((result) => {
                             // Ensure record was inserted
                             result.length.should.equal(1)
                     }).then( v.subscribe('topics', '/reliableTopic', 
-                                {subscriptionId: subscriptionId, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                                {subscriptionName: subscriptionName, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
                         //Re-establish the same connection to the same subscription
                                 resp = r;
-                                if (r.body.subscriptionId !== undefined) {
-                                    subscriptionId.should.equal(r.body.subscriptionId);
+                                if (r.body.subscriptionName !== undefined) {
+                                    subscriptionName.should.equal(r.body.subscriptionName);
                                 }
                     })).then(function() {
                         // Delay a bit to allow for event processing
-                        return new Promise((resolve) => setTimeout(resolve, 2000));
+                        return new Promise((resolve) => setTimeout(resolve, 3000));
                     })
                     .then(function() {
                         //Ensure we are still receiving messages on that topic
@@ -584,7 +584,7 @@ describe('Vantiq SDK Integration Tests', function() {
 
     it('acknowledge a reliable message', function() {
         var resp = null;
-        var subscriptionId = null;
+        var subscriptionName = null;
         var topic = {
             name: '/reliableTopic/ack',
             description: "The reliable topic",
@@ -600,15 +600,15 @@ describe('Vantiq SDK Integration Tests', function() {
                 result.length.should.equal(1)
             }).then( v.subscribe('topics', '/reliableTopic/ack',  {persistent: true}, (r) => {
                 resp = r;
-                if (r.body.subscriptionId !== undefined) {
-                    subscriptionId = r.body.subscriptionId;
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
                 }
             })).then(function() {
                     // Delay a bit to allow for event processing
                     return new Promise((resolve) => setTimeout(resolve, 500));
             }).then(function() {
                 // Select persistent subscription record
-                return v.select('ArsSubscription', [], {_id: subscriptionId})
+                return v.select('ArsSubscription', [], {name: subscriptionName})
             }).then((result) => {
                         // Ensure record was inserted
                 result.length.should.equal(1)
@@ -630,15 +630,12 @@ describe('Vantiq SDK Integration Tests', function() {
                 resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic/ack');
                 resp.body.value.foo.should.equal('bar');
                 //acknowledge the message
-                return v.acknowledge(subscriptionId, "/topics/reliableTopic/ack", resp.body);
+                return v.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
             }).then (function() {
                 // Delay a bit to allow for event processing
                 //And then select the Ack in the database
                 this.checkForAck = function() {
-                    var where =  {
-                        subscriptionId: subscriptionId
-                    };
-                    return v.select('ArsEventAcknowledgement', [], where)
+                    return v.select('ArsEventAcknowledgement', [], {})
                         .then((result) => {
                             // Ensure record was inserted
                             
@@ -648,7 +645,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 return new Promise(function(resolve, reject) {
                     setTimeout(function() {
                         resolve(checkForAck());
-                    }, 10000);
+                    }, 20000);
                 });
             });
         });
