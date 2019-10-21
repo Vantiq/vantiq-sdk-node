@@ -36,7 +36,7 @@ if(!SERVER || !AUTHTOKEN) {
 // Tests
 //
 describe('Vantiq SDK Integration Tests', function() {
-    this.timeout(5000);
+    this.timeout(30000);
 
     var v;
     before(function() {
@@ -310,7 +310,7 @@ describe('Vantiq SDK Integration Tests', function() {
         })
         .then(function() {
             should.exist(resp);
-            resp.headers['X-Request-Id'].should.equal('/topics//test/topic');
+            resp.headers['X-Request-Id'].should.equal('/topics/test/topic');
             resp.body.value.foo.should.equal('bar');
         });
     });
@@ -487,4 +487,167 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
+    it('can subscribe to a reliable topic event', function() {
+        var resp = null;
+        var subscriptionName = null;
+        var topic = {
+            name: '/reliableTopic',
+            description: "The reliable topic",
+            isReliable: true,
+            redeliveryFrequency: 1,
+            redeliveryTTL: 25
+        };
+        var numMessages = 0;
+        return v.insert('system.topics', topic)
+            .then((result) => {
+                // Find the nearly inserted reliable topic
+                return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
+                    // Ensure record was inserted
+                    result.length.should.equal(1)
+                    //Create a persistent subscription to the reliableTopic
+                }).then( v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
+                    resp = r;
+                    if (r.body.subscriptionName !== undefined) {
+                        subscriptionName = r.body.subscriptionName;
+                    }
+                    if (r.body.value && r.body.value.foo) {
+                        numMessages++;
+                    }
+                })).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 500));
+                }).then(function() {
+                // Select ArsSubscription to ensure the persistent subscription was made
+                    return v.select('ArsSubscription', [], {name: subscriptionName}).then((result) => {
+                        // Ensure record was inserted
+                        result.length.should.equal(1)
+                    })
+                    }).then(function() {
+                        //Publish to reliable topic
+                        return v.publish('topics', '/reliableTopic', { foo: 'bar' });
+                    }).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 500));
+                    })
+                    .then(function() {
+                        should.exist(resp);
+                        //Ensure receipt of event
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 1) {
+                            numMessages.should.throw("Error")
+                        }
+                }).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 2000));
+                    })
+                    .then(function() {
+                        //Ensure we get the event redelivered
+                        should.exist(resp);
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 2) {
+                            resp.should.throw("Err")
+                        }
+                    }).then(function() {
+                        //Close the connection
+                        v.unsubscribeAll();
+                    }).then(function() {
+                        // Make sure the persistent subscription was not deleted
+                        return v.select('ArsSubscription', [], {name: subscriptionName})
+                        .then((result) => {
+                            // Ensure record was inserted
+                            result.length.should.equal(1)
+                    }).then( v.subscribe('topics', '/reliableTopic', 
+                        {subscriptionName: subscriptionName, requestId: "/topics/reliableTopic", persistent: true}, (r) => {
+                        //Re-establish the same connection to the same subscription
+                        resp = r;
+                        if (r.body.subscriptionName !== undefined) {
+                            subscriptionName.should.equal(r.body.subscriptionName);
+                        }
+                    })).then(function() {
+                        // Delay a bit to allow for event processing
+                        return new Promise((resolve) => setTimeout(resolve, 3000));
+                    })
+                    .then(function() {
+                        //Ensure we are still receiving messages on that topic
+                        should.exist(resp);
+                        resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic');
+                        resp.body.value.foo.should.equal('bar');
+                        if (numMessages < 3) {
+                            resp.should.throw("Err")
+                        }                    
+                    });
+            });
+        });
+    });
+
+    it('acknowledge a reliable message', function() {
+        var resp = null;
+        var subscriptionName = null;
+        var topic = {
+            name: '/reliableTopic/ack',
+            description: "The reliable topic",
+            isReliable: true,
+            redeliveryFrequency: 1,
+            redeliveryTTL: 25
+        };
+        //Insert reliable topic
+        return v.insert('system.topics', topic)
+            .then((result) => {
+            return v.select('system.topics', [], {name: "/reliableTopic/ack"}).then((result) => {
+                // Ensure topic was inserted
+                result.length.should.equal(1)
+            }).then( v.subscribe('topics', '/reliableTopic/ack',  {persistent: true}, (r) => {
+                resp = r;
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
+                }
+            })).then(function() {
+                // Delay a bit to allow for event processing
+                return new Promise((resolve) => setTimeout(resolve, 500));
+            }).then(function() {
+                // Select persistent subscription record
+                return v.select('ArsSubscription', [], {name: subscriptionName})
+            }).then((result) => {
+                        // Ensure record was inserted
+                result.length.should.equal(1)
+            }).then(function() {
+                return v.publish('topics', '/reliableTopic/ack', { foo: 'bar' });
+            }).then(function() {
+                // Delay a bit to allow for event processing
+                return new Promise((resolve) => setTimeout(resolve, 500));
+            }).then(function() {
+                should.exist(resp);
+                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic/ack');
+                resp.body.value.foo.should.equal('bar');
+            }).then(function() {
+                // Delay a bit to allow for the redelivery TTL
+                return new Promise((resolve) => setTimeout(resolve, 2000));
+            }).then(function() {
+                //Ensure the message was redelivered
+                should.exist(resp);
+                resp.headers['X-Request-Id'].should.equal('/topics/reliableTopic/ack');
+                resp.body.value.foo.should.equal('bar');
+                //acknowledge the message
+                return v.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
+            }).then (function() {
+                // Delay a bit to allow for event processing
+                //And then select the Ack in the database
+                this.checkForAck = function() {
+                    return v.select('ArsEventAcknowledgement', [], {})
+                        .then((result) => {
+                            // Ensure record was inserted
+                            
+                            result.length.should.equal(1)
+                        });
+                };
+                return new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                        resolve(checkForAck());
+                    }, 20000);
+                });
+            });
+        });
+     });
 });
