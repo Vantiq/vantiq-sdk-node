@@ -908,5 +908,3 @@ v.subscribe('topics', '/reliableTopic',  {persistent: true, subscriptionName: su
         //message.body is an event on the subscribed topic. Acknowledge that we received the event
         vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
     }
-  
-```
