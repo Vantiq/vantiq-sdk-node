@@ -59,6 +59,7 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 * [Vantiq.upload](#vantiq-upload)
 * [Vantiq.download](#vantiq-download)
 * [Vantiq.unsubscribeAll](#vantiq-unsubscribeAll)
+* [Vantiq.acknowledge](#vantiq-acknowledge)
 
 ### Error
 
@@ -853,7 +854,7 @@ The `acknowledge` method is used to acknowledge the receipt of messages from rel
 ### Signature
 
 ```java
-void vantiq.ack(String subscriptionName, String requestId, Map msg)
+void vantiq.acknowledge(subscriptionName, requestId, msg)
 ```
 
 ### Parameters
