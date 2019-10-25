@@ -79,10 +79,9 @@ This class exposes the [Vantiq REST API](https://dev.vantiq.com/docs/system/api/
 
 ### Option Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-server | String | Yes | The Vantiq server URL to connect to, e.g. `https://dev.vantiq.com`
-apiVersion | Integer | No | The version of the API to use.  Defaults to the latest.
+**`String server`**:  (*Required*) Specifies the VANTIQ server URL to connect to, e.g. `https://dev.vantiq.com` 
+
+**`int apiVersion`** Integer to specify the version of the API to use.  Defaults to the latest. 
 
 ### Returns
 
@@ -108,10 +107,10 @@ are not stored.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-username | String | Yes | The username to provide access to the Vantiq server
-password | String | Yes | The password to provide access to the Vantiq server
+**`String username`**: (*Required*) The username to provide access to the Vantiq server 
+
+**`String password`**:  (*Required*) The password to provide access to the Vantiq server 
+
 
 ### Returns
 
@@ -151,19 +150,15 @@ resource.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to query
-props| Array | No | Specifies the desired properties to be returned in each record.  An empty array or null value means all properties will be returned.
-where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
-sort | Object | No | Specifies the desired sort for the result set.
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
 
-The `props` is an array of property names indciating which properties should be returned.
-    
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
+**`List<String> props`**: (*Required*) Specifies the desired properties to be returned in each record.  An empty list or null value means all properties will be returned.
 
-The `sort` is an object with keys that are the properties to sort on and the 
-values indicate ascending (1) or descending (-1).
+**`Object where`**: Specifies constraints to filter the data.  Null means all records will be returned.
+
+**`SortSpec sort`**: Specifies the desired sort for the result set
+
 
 ### Returns
 
@@ -204,10 +199,11 @@ by the given identifier.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to query
-id   | String | Yes | The id for the given record
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+
+**`String id`**: (*Required*) The id for the given record 
+
 
 ### Returns
 
@@ -242,12 +238,10 @@ number of records rather than returning the records themselves.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to query
-where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
-
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ 
+**`Object where`**:  Specifies constraints to filter the data.  Null means all records will be returned.
 
 ### Returns
 
@@ -280,10 +274,11 @@ The `insert` method creates a new record of a given resource.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to insert
-object | Object | Yes | The object to insert
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ 
+ 
+**`Object object`**: (*Required*) The object to insert.
 
 ### Returns
 
@@ -316,11 +311,12 @@ Any properties not specified are not changed in the underlying record.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to update
-id   | String | Yes | The "_id" internal identifier for the record
-props | Object | Yes | The properties to update in the record
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ 
+**`String id`**: (*Required*)  The unique identifier for the record ("_id" for user defined types)
+ 
+**`Object props`**:  The properties to update in the record.  
 
 ### Returns
 
@@ -354,10 +350,11 @@ natural keys defined on the resource.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to upsert
-object | Object | Yes | The object to upsert
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`. 
+ 
+**`Object object`**: (*Required*) The object to upsert. 
+
 
 ### Returns
 
@@ -389,12 +386,11 @@ require a constraint indicating which records to remove.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to remove
-where | Object | Yes | Specifies which records to remove
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+  
+**`Object where`**: (*Required*) Specifies which records to remove  
 
-The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
 
 ### Returns
 
@@ -427,11 +423,10 @@ The `deleteOne` method removes a single record specified by the given identifier
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to remove
-id   | String | Yes | The id for the given record
-
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ 
+**`String id`**: (*Required*)  The unique identifier for the record ("_id" for user defined types)
 ### Returns
 
 The `deleteOne` method returns a promise that resolves to `true` if the record was removed
@@ -478,11 +473,12 @@ publish operation on the source.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource to publish.  Must be either 'topics' or 'sources'.
-id       | String | Yes | The id for the specific resource to use.  An example topic is '/test/topic'.  An example source is 'mqttChannel'.
-payload  | Object | Yes | For topics, the payload is the message to send.  For sources, this is the parameters for the source.
+**`String resource`**:  (*Required*) The name of the resource type to query.
+ Must be either `SystemResources.TOPICS.value()` or `SystemResources.SOURCES.value()`.
+ 
+**`String id`**: (*Required*)  The unique name for the resource (eg:/test/topic or 'mqttSrc')
+ 
+**`Object payload`**:  For topics, the payload is the message to send.  For sources, this is the parameters for the source.
 
 For sources, the parameters required are source specific and are the same as those required
 when performing a `PUBLISH ... TO SOURCE ... USING params`.  Please refer to the specific source definition
@@ -533,10 +529,9 @@ take parameters (i.e. arguments) and produce a result.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-procedure | String | Yes | The procedure to execute
-params | Object | No | An object that holds the parameters
+**`String procedure`**: (*Required*) The name of the procedure to execute
+
+**`Object params`**: (*Required*) An object that holds the parameters where each key is the parameter name
 
 The parameters may be provided as an array where the arguments are given in order.
 Alternatively, the parameters may be provided as an object where the arguments
@@ -575,10 +570,10 @@ take parameters (i.e. arguments) and produce a result.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-source | String | Yes | The source to perform the query
-params | Object | No | An object that holds the parameters
+
+**`String modelName`**: (*Required*) The name of the analytics model to execute
+
+**`Object params`**:  An object that holds the parameters.
 
 The parameters required are source specific and are the same as those required
 when performing a `SELECT ... FROM SOURCE ... WITH params`.  Please refer to the specific source definition
@@ -619,28 +614,32 @@ callback is executed whenever a matching event occurs.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-resource | String | Yes | The resource event to subscribe.  Must be either 'topics' or 'sources' or 'types'.
-name     | String | Yes | The resource name that identifies the specific resource event.  For topics, this is the topic name (e.g. '/my/topic/').  For sources, this is the source name.  For types, this is the data type name.
-operation| String | No  | This only applies for 'types' and specifies the operation to listen to (e.g. 'insert', 'update', or 'delete')
-callback | Function| Yes | This is the callback that executes whenever a matching event occurs.  The signiature is: `callback(message)`.
+**`String resource`**: (*Required*) Describes the type of event being subscribed to. 
+Must be either SystemResources.TOPICS.value(), SystemResources.SOURCES.value() or SystemResources.TYPES.value().
+
+**`String name`**: (*Required*) A required String that identifies the specific resource event. For topics, this is the topic name (e.g. '/my/topic/'). 
+ For sources, this is the source name.  For types, this is the data type name (e.g. TypeOperation.INSERT, TypeOperation.UPDATE, TypeOperation.DELETE)
+
+**`TypeOperation operation`**: (*Required for Type events* )Only required for type events. Specifies the operation to listen to 
+(e.g. TypeOperation.INSERT, TypeOperation.UPDATE, TypeOperation.DELETE)
+
+**`SubscriptionCallback callback`**: (*Required*) This is the callback that executes whenever a matching event occurs. 
+ The signiature is: `callback(message)`
+ 
+**`Map parameters`**: Not required map specifying extra details about the subscription to the server.
+  (eg: {persistent:true} to create a persistent subscription,
+   {persistent:true: subscriptionName: 'mySub', requestId: requestId} to reconnect to a broken persistent subscription)
+  
 
 The `message` that is provided when an event occurs contains the following:
 
-Name | Type | Description
-:--: | :--: | -----------
-status | int | The HTTP status code associated with the message, usually 100.
-contentType | String | The content type for the body of the message.  Typically, this is `application/json`.
-headers | Object | The headers associated with the event.  The `X-Request-Id` header will be based on the resource path for the event.
-body | Object | The content of the event.
+**`int status`**: The status for the given message.  The possible values are the HTTP status codes. Typically, this would be 100. 
 
-The structure of the body of the event is:
+**`String contentType`**:  The content MIME type for the message body.  Typically, this is `application/json`.
 
-Name | Type | Description
-:--: | :--: | -----------
-path | String | The full event path
-value | Object | The payload of the event.
+**`Map<String,String> headers`**: A map of headers associated with the response.
+
+**`Object body`**: The Object payload for the event.  For JSON encoded responses, this is typically a Map with keys *path* (full event path) and *value* (payload of the event).
 
 ### Returns
 
@@ -717,23 +716,25 @@ The `upload` method performs a upload of a file into an `ArsDocument` resource.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-file | File | Yes | The full path to the file to be uploaded
-contentType | String | Yes | The MIME type of the uploaded file (e.g. "image/jpeg")
-String | documentPath | Yes | The "path" of the ArsDocument in Vantiq (e.g. "assets/myDocument.txt")
-String | resourcePath | No | The "path" of the Vantiq resource that the file will be uploaded to (e.g. "/resources/documents", "/resources/images/", or "/resources/videos")
+**`File file`**: (*Required*) The file to be uploaded
+
+**`String contentType`**: (*Required*) The MIME type of the uploaded file (e.g. "image/jpeg")
+
+**`String documentPath`**: (*Required*) The "path" of the ArsDocument in Vantiq (e.g. "assets/myDocument.txt")
+
+**`String  resourcePath`**: The "path" of the Vantiq resource to which you wish to upload the file (e.g. `"/resources/documents"`, `"/resources/images"`, or `"/resources/videos"`) 
 
 ### Returns
 
 The `upload` method returns a promiise that resolves to the `ArsDocument` object containing 
 information about the uploaded file.  In particular, the response will contain:
 
-Name | Type | Description
-:--: | :--: | -----------
-name | String | The document path (e.g. "assets/myDocument.txt")
-fileType | String | The MIME type of the uploaded file (e.g. "image/jpeg")
-content | String | This provides the URI path to download the content.  This is used in the [download](#vantiq-download) method.
+**`String name`**:  The document path (e.g. "assets/myDocument.txt")
+
+**`StringfileType`**: The MIME type of the uploaded file (e.g. "image/jpeg")
+
+**`String content`**: This provides the URI path to download the content.  This is used in the [download](#user-content-vantiq-download) method.
+
 
 ### Example
 
@@ -764,9 +765,7 @@ uploaded.  The result is streamed to the client.
 
 ### Parameters
 
-Name | Type | Required | Description
-:--: | :--: | :------:| -----------
-path | String | Yes | This is the path of the file and is specified in the `content` field in the `ArsDocument` associated with the file in Vantiq.
+**`String path`**: (*Required*) This is the path to the file.  This can be gotten from the `content` field in the ArsDocument or the returned value from the `upload` method.
 
 ### Returns
 
@@ -811,13 +810,12 @@ The REST API provides both an HTTP status code and an error object which is retu
 
 ### Parameters
 
-Name | Type | Description
-:--: | :--: | -----------
-statusCode | Number | The [HTTP status code](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) in the response.
-body | Array\<Object\> | The array of all errors that occurred during the SDK REST call.
-body.code | String | The Vantiq error id (e.g. _"io.vantiq.authentication.failed"_)
-body.message | String | The human readable message associated with the error
-body.params | Array\<Object\> | An array of arguments associated with the error
+
+**`Integer statusCode `**: The [HTTP status code](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) in the response.
+**`Array<Object> body`**: The array of all errors that occurred during the SDK REST call.
+**`String body.code`**:  The Vantiq error id (e.g. _"io.vantiq.authentication.failed"_)
+**`String body.message`**:  The human readable message associated with the error
+**`Array<Object> body.params`**:  An array of arguments associated with the error
 
 ### Example
 
@@ -842,4 +840,96 @@ To catch if a select against an unknown type.
                     console.error(err)
                 }
             });
+
+## <a id="vantiq-acknowledge"></a> Vantiq.acknowledge
+
+The `acknowledge` method is used to acknowledge the receipt of messages from reliable resources after creating a persistent subscription.
+ The provided callback is executed whenever a matching event occurs.
+
+### Signature
+
+```java
+void vantiq.ack(String subscriptionName, String requestId, Map msg)
+```
+
+### Parameters
+
+**`String subscriptionName`**: (*Required*) The name of the subscription that uniquely identifies the persistent subscription.
+This was returned by the server on creation of the persistent subscription. 
+
+**`String requestId`**: (*Required*) The id of the requestId that that uniquely identifies the websocket requests made by this subscription.
+This was returned by the server on creation of the persistent subscription. 
+
+**`Map msg`**: (*Required*) The message in the event being acknowledged. This is the body of the SubscriptionMessage
+  
+
+### Returns
+
+N/A
+
+### Example
+
+Create a callback that acknowledges events as they arrive.
+```
+public class AcknowledgingOutputCallback implements SubscriptionCallback {
+   private String subscriptionName;
+   private String requestId;
+
+    @Override
+    public void onConnect() {
+        System.out.println("Connected Successfully");
+    }
+
+    @Override
+    public void onMessage(SubscriptionMessage message) {
+        //Server response with subscription information (not a topic event)
+        if (message.body.subscriptionName) {
+            this.subscriptionName = message.body.subscriptionName;
+            this.requestId = message.body.requestId;
+            System.out.println("SubscriptionName " + this.subscriptionName);
+            System.out.println("RequestId " + this.requestId);
+        } else {
+            //message.body is an event on the subscribed topic. Acknowledge that we received the event
+            vantiq.ack(this.subscriptionName, this.requestId, message.body);
+        }
+    }
+
+    @Override
+    public void onError(String error) {
+        System.out.println("Error: " + error);
+    }
+
+    @Override
+    public void onFailure(Throwable t) {
+        t.printStackTrace();
+    }
+}
+
+```
+Create a persistent subscription  to the `/test/topic` reliable topic that acknowledges when events are published to the topic.
+
+    vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), 
+                     "/test/topic", 
+                     null, 
+                     new AcknowledgingOutputCallback(),
+                     {persistent: true});
+                     
+  
+
+Create a subscription to the `MySource` reliable source that prints out when messages arrive at the source.
+
+    vantiq.subscribe(Vantiq.SystemResources.SOURCES.value(), 
+                     "MySource", 
+                     null, 
+                     new StandardOutputCallback(),
+                      {persistent: true});
+
+To reconnect to a severed persistent subscription.
+    vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), 
+                     "/test/topic", 
+                     null, 
+                     new AcknowledgingOutputCallback(),
+                     {persistent: true, subscriptionName: subscriptionName, requestId: requestsId});
+
+
 
