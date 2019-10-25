@@ -812,9 +812,13 @@ The REST API provides both an HTTP status code and an error object which is retu
 
 
 **`Integer statusCode `**: The [HTTP status code](http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml) in the response.
+
 **`Array<Object> body`**: The array of all errors that occurred during the SDK REST call.
+
 **`String body.code`**:  The Vantiq error id (e.g. _"io.vantiq.authentication.failed"_)
+
 **`String body.message`**:  The human readable message associated with the error
+
 **`Array<Object> body.params`**:  An array of arguments associated with the error
 
 ### Example
@@ -869,67 +873,43 @@ N/A
 
 ### Example
 
-Create a callback that acknowledges events as they arrive.
-```
-public class AcknowledgingOutputCallback implements SubscriptionCallback {
-   private String subscriptionName;
-   private String requestId;
 
-    @Override
-    public void onConnect() {
-        System.out.println("Connected Successfully");
-    }
 
-    @Override
-    public void onMessage(SubscriptionMessage message) {
-        //Server response with subscription information (not a topic event)
-        if (message.body.subscriptionName) {
-            this.subscriptionName = message.body.subscriptionName;
-            this.requestId = message.body.requestId;
-            System.out.println("SubscriptionName " + this.subscriptionName);
-            System.out.println("RequestId " + this.requestId);
-        } else {
-            //message.body is an event on the subscribed topic. Acknowledge that we received the event
-            vantiq.ack(this.subscriptionName, this.requestId, message.body);
-        }
-    }
-
-    @Override
-    public void onError(String error) {
-        System.out.println("Error: " + error);
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-        t.printStackTrace();
-    }
-}
-
-```
 Create a persistent subscription  to the `/test/topic` reliable topic that acknowledges when events are published to the topic.
-
-    vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), 
-                     "/test/topic", 
-                     null, 
-                     new AcknowledgingOutputCallback(),
-                     {persistent: true});
-                     
+```
+v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
+                //Server response with subscription information (not a topic event)
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
+                } else {
+                    //message.body is an event on the subscribed topic. Acknowledge that we received the event
+                    vantiq.acknowledge(subscriptionName, "/topics/reliableTopic", resp.body);
+                }
   
-
+```
 Create a subscription to the `MySource` reliable source that prints out when messages arrive at the source.
-
-    vantiq.subscribe(Vantiq.SystemResources.SOURCES.value(), 
-                     "MySource", 
-                     null, 
-                     new StandardOutputCallback(),
-                      {persistent: true});
-
+```
+v.subscribe('sources', 'myReliableSource',  {persistent: true}, (r) => {
+                //Server response with subscription information (not a topic event)
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
+                } else {
+                    //message.body is an event on the subscribed topic. Acknowledge that we received the event
+                    vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
+                }
+```
 To reconnect to a severed persistent subscription.
-    vantiq.subscribe(Vantiq.SystemResources.TOPICS.value(), 
-                     "/test/topic", 
-                     null, 
-                     new AcknowledgingOutputCallback(),
-                     {persistent: true, subscriptionName: subscriptionName, requestId: requestsId});
+v.subscribe('topics', '/reliableTopic',  {persistent: true, subscriptionName: subscriptionName, requestId: '/topics/reliableTopic'}, (r) => {
+    //Server response with subscription information (not a topic event)
+    if (r.body.subscriptionName !== undefined) {
+        subscriptionName = r.body.subscriptionName;
+    } else {
+        //message.body is an event on the subscribed topic. Acknowledge that we received the event
+        vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
+    }
+  
+```
+                    
 
 
 
