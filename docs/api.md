@@ -152,7 +152,7 @@ resource.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
 
 **`List<String> props`**: (*Required*) Specifies the desired properties to be returned in each record.  An empty list or null value means all properties will be returned.
 
@@ -201,7 +201,7 @@ by the given identifier.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
 
 **`String id`**: (*Required*) The id for the given record 
 
@@ -240,7 +240,7 @@ number of records rather than returning the records themselves.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
  
 **`Object where`**:  Specifies constraints to filter the data.  Null means all records will be returned.
 
@@ -276,7 +276,7 @@ The `insert` method creates a new record of a given resource.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
  
  
 **`Object object`**: (*Required*) The object to insert.
@@ -313,7 +313,7 @@ Any properties not specified are not changed in the underlying record.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
  
 **`String id`**: (*Required*)  The unique identifier for the record ("_id" for user defined types)
  
@@ -352,7 +352,7 @@ natural keys defined on the resource.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`. 
+ Must be either `topics`, `sources` or `types`. 
  
 **`Object object`**: (*Required*) The object to upsert. 
 
@@ -388,7 +388,7 @@ require a constraint indicating which records to remove.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
   
 **`Object where`**: (*Required*) Specifies which records to remove  
 
@@ -425,7 +425,7 @@ The `deleteOne` method removes a single record specified by the given identifier
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()`, `SystemResources.SOURCES.value()` or `SystemResources.TYPES.value()`.
+ Must be either `topics`, `sources` or `types`.
  
 **`String id`**: (*Required*)  The unique identifier for the record ("_id" for user defined types)
 ### Returns
@@ -475,7 +475,7 @@ publish operation on the source.
 ### Parameters
 
 **`String resource`**:  (*Required*) The name of the resource type to query.
- Must be either `SystemResources.TOPICS.value()` or `SystemResources.SOURCES.value()`.
+ Must be either `topics` or `sources`.
  
 **`String id`**: (*Required*)  The unique name for the resource (eg:/test/topic or 'mqttSrc')
  
@@ -616,7 +616,7 @@ callback is executed whenever a matching event occurs.
 ### Parameters
 
 **`String resource`**: (*Required*) Describes the type of event being subscribed to. 
-Must be either SystemResources.TOPICS.value(), SystemResources.SOURCES.value() or SystemResources.TYPES.value().
+Must be either topics, sources or types.
 
 **`String name`**: (*Required*) A required String that identifies the specific resource event. For topics, this is the topic name (e.g. '/my/topic/'). 
  For sources, this is the source name.  For types, this is the data type name (e.g. TypeOperation.INSERT, TypeOperation.UPDATE, TypeOperation.DELETE)
