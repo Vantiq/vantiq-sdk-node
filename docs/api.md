@@ -158,8 +158,8 @@ resource.
 
 **`Object where`**: Specifies constraints to filter the data.  Null means all records will be returned.
 
-**`SortSpec sort`**: Specifies the desired sort for the result set
-
+**`Object sort`**: An object with keys that are the properties to sort on and the 
+                   values indicate ascending (1) or descending (-1).
 
 ### Returns
 
@@ -621,10 +621,10 @@ Must be either SystemResources.TOPICS.value(), SystemResources.SOURCES.value() o
 **`String name`**: (*Required*) A required String that identifies the specific resource event. For topics, this is the topic name (e.g. '/my/topic/'). 
  For sources, this is the source name.  For types, this is the data type name (e.g. TypeOperation.INSERT, TypeOperation.UPDATE, TypeOperation.DELETE)
 
-**`TypeOperation operation`**: (*Required for Type events* )Only required for type events. Specifies the operation to listen to 
-(e.g. TypeOperation.INSERT, TypeOperation.UPDATE, TypeOperation.DELETE)
+**`String operation`**: (*Required for Type events* )Only required for type events. Specifies the operation to listen to 
+(e.g. "insert", "update", "delete")
 
-**`SubscriptionCallback callback`**: (*Required*) This is the callback that executes whenever a matching event occurs. 
+**`Function callback`**: (*Required*) This is the callback that executes whenever a matching event occurs. 
  The signiature is: `callback(message)`
  
 **`Map parameters`**: Not required map specifying extra details about the subscription to the server.
@@ -638,7 +638,7 @@ The `message` that is provided when an event occurs contains the following:
 
 **`String contentType`**:  The content MIME type for the message body.  Typically, this is `application/json`.
 
-**`Map<String,String> headers`**: A map of headers associated with the response.
+**`Objectheaders`**: A map of headers associated with the response.
 
 **`Object body`**: The Object payload for the event.  For JSON encoded responses, this is typically a Map with keys *path* (full event path) and *value* (payload of the event).
 
@@ -732,7 +732,7 @@ information about the uploaded file.  In particular, the response will contain:
 
 **`String name`**:  The document path (e.g. "assets/myDocument.txt")
 
-**`StringfileType`**: The MIME type of the uploaded file (e.g. "image/jpeg")
+**`String fileType`**: The MIME type of the uploaded file (e.g. "image/jpeg")
 
 **`String content`**: This provides the URI path to download the content.  This is used in the [download](#user-content-vantiq-download) method.
 
@@ -900,6 +900,7 @@ v.subscribe('sources', 'myReliableSource',  {persistent: true}, (r) => {
                 }
 ```
 To reconnect to a severed persistent subscription.
+```
 v.subscribe('topics', '/reliableTopic',  {persistent: true, subscriptionName: subscriptionName, requestId: '/topics/reliableTopic'}, (r) => {
     //Server response with subscription information (not a topic event)
     if (r.body.subscriptionName !== undefined) {
@@ -908,3 +909,4 @@ v.subscribe('topics', '/reliableTopic',  {persistent: true, subscriptionName: su
         //message.body is an event on the subscribed topic. Acknowledge that we received the event
         vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
     }
+```
