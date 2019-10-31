@@ -860,9 +860,7 @@ void vantiq.acknowledge(subscriptionName, requestId, msg)
 Name | Type | Required | Description
 :--: | :--: |:--: | -----------
 subscriptionName | String | Yes | The name of the subscription that uniquely identifies the persistent subscription. This was returned by the server on creation of the persistent subscription. 
-
 requestId | String | Yes |  The id of the requestId that that uniquely identifies the websocket requests made by this subscription. This was returned by the server on creation of the persistent subscription. 
-
 msg | Object | Yes |   The message in the event being acknowledged. This is the body of the SubscriptionMessage
   
 
