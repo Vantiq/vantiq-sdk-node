@@ -59,6 +59,7 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 * [Vantiq.upload](#vantiq-upload)
 * [Vantiq.download](#vantiq-download)
 * [Vantiq.unsubscribeAll](#vantiq-unsubscribeAll)
+* [Vantiq.acknowledge](#vantiq-acknowledge)
 
 ### Error
 
@@ -153,7 +154,7 @@ resource.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to query
+resource | String | Yes | The name of the resource type to query.
 props| Array | No | Specifies the desired properties to be returned in each record.  An empty array or null value means all properties will be returned.
 where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
 sort | Object | No | Specifies the desired sort for the result set.
@@ -207,7 +208,7 @@ by the given identifier.
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
 resource | String | Yes | The resource to query
-id   | String | Yes | The id for the given record
+id   | String | Yes | The unique identifier for the record ("_id" for user defined Types)
 
 ### Returns
 
@@ -244,7 +245,7 @@ number of records rather than returning the records themselves.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to query
+resource | String | Yes | The name of the resource to query
 where | Object | No | Specifies constraints to filter the data.  Null means all records will be returned.
 
 The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
@@ -282,7 +283,7 @@ The `insert` method creates a new record of a given resource.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to insert
+resource | String | Yes | The name of the resource to insert
 object | Object | Yes | The object to insert
 
 ### Returns
@@ -318,8 +319,8 @@ Any properties not specified are not changed in the underlying record.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to update
-id   | String | Yes | The "_id" internal identifier for the record
+resource | String | Yes | The name of the resource to update
+id   | String | Yes | The unique identifier for the record ("_id" for user defined Types)
 props | Object | Yes | The properties to update in the record
 
 ### Returns
@@ -356,7 +357,7 @@ natural keys defined on the resource.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to upsert
+resource | String | Yes | The name of the resource to upsert
 object | Object | Yes | The object to upsert
 
 ### Returns
@@ -391,7 +392,7 @@ require a constraint indicating which records to remove.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to remove
+resource | String | Yes | The name of the resource to remove
 where | Object | Yes | Specifies which records to remove
 
 The `where` is an object with supported operations defined in [API operations](https://dev.vantiq.com/docs/system/api/index.html#where-parameter).
@@ -429,7 +430,7 @@ The `deleteOne` method removes a single record specified by the given identifier
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to remove
+resource | String | Yes | The name of the resource to remove
 id   | String | Yes | The id for the given record
 
 ### Returns
@@ -535,7 +536,7 @@ take parameters (i.e. arguments) and produce a result.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-procedure | String | Yes | The procedure to execute
+procedure | String | Yes | The name of the procedure to execute
 params | Object | No | An object that holds the parameters
 
 The parameters may be provided as an array where the arguments are given in order.
@@ -625,6 +626,7 @@ resource | String | Yes | The resource event to subscribe.  Must be either 'topi
 name     | String | Yes | The resource name that identifies the specific resource event.  For topics, this is the topic name (e.g. '/my/topic/').  For sources, this is the source name.  For types, this is the data type name.
 operation| String | No  | This only applies for 'types' and specifies the operation to listen to (e.g. 'insert', 'update', or 'delete')
 callback | Function| Yes | This is the callback that executes whenever a matching event occurs.  The signiature is: `callback(message)`.
+params   | Map | No | Map specifying extra details about the subscription to the server. (eg: {persistent:true} to create a persistent subscription, {persistent:true: subscriptionName: 'mySub', requestId: requestId} to reconnect to a broken persistent subscription)
 
 The `message` that is provided when an event occurs contains the following:
 
@@ -684,7 +686,7 @@ Create a subscription to the `MyDataType` type for that prints out when that typ
         .then(() => {
             console.log("Subscription succeeded.");
         });
-
+See [Vantiq.acknowledge](#vantiq-acknowledge) section for how to make a persistent subscription to a reliable resource
 ## <a id="vantiq-unsubscribeAll"></a> Vantiq.unsubscribeAll
 
 The `unsubscribeAll` method removes all active subscriptions to the Vantiq server by
@@ -843,3 +845,64 @@ To catch if a select against an unknown type.
                 }
             });
 
+## <a id="vantiq-acknowledge"></a> Vantiq.acknowledge
+
+The `acknowledge` method is used to acknowledge the receipt of messages from reliable resources after creating a persistent subscription.
+ The provided callback is executed whenever a matching event occurs.
+
+### Signature
+
+```java
+void vantiq.acknowledge(subscriptionName, requestId, msg)
+```
+
+### Parameters
+Name | Type | Required | Description
+:--: | :--: |:--: | -----------
+subscriptionName | String | Yes | The name of the subscription that uniquely identifies the persistent subscription. This was returned by the server on creation of the persistent subscription. 
+requestId | String | Yes |  The id of the requestId that that uniquely identifies the websocket requests made by this subscription. This was returned by the server on creation of the persistent subscription. 
+msg | Object | Yes |   The message in the event being acknowledged. This is the body of the SubscriptionMessage
+  
+
+### Returns
+
+N/A
+
+### Example
+
+
+
+Create a persistent subscription  to the `/test/topic` reliable topic that acknowledges when events are published to the topic.
+```
+v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
+                //Server response with subscription information (not a topic event)
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
+                } else {
+                    //message.body is an event on the subscribed topic. Acknowledge that we received the event
+                    vantiq.acknowledge(subscriptionName, "/topics/reliableTopic", resp.body);
+                }
+  
+```
+Create a subscription to the `MySource` reliable source that prints out when messages arrive at the source.
+```
+v.subscribe('sources', 'myReliableSource',  {persistent: true}, (r) => {
+                //Server response with subscription information (not a topic event)
+                if (r.body.subscriptionName !== undefined) {
+                    subscriptionName = r.body.subscriptionName;
+                } else {
+                    //message.body is an event on the subscribed topic. Acknowledge that we received the event
+                    vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
+                }
+```
+To reconnect to a severed persistent subscription.
+```
+v.subscribe('topics', '/reliableTopic',  {persistent: true, subscriptionName: subscriptionName, requestId: '/topics/reliableTopic'}, (r) => {
+    //Server response with subscription information (not a topic event)
+    if (r.body.subscriptionName !== undefined) {
+        subscriptionName = r.body.subscriptionName;
+    } else {
+        //message.body is an event on the subscribed topic. Acknowledge that we received the event
+        vantiq.acknowledge(subscriptionName, "/topics/reliableTopic/ack", resp.body);
+    }
+```

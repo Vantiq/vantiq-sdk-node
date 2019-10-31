@@ -399,7 +399,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 });
             })
             .then((result) => {
-                result.should.equal('This is a test file used for mock and integration unit testing.\n');
+                result.trim().should.equal('This is a test file used for mock and integration unit testing.');
             });
     });
 

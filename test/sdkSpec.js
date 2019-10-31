@@ -443,7 +443,14 @@ describe('Vantiq API', function() {
                     });
             });
         });
-
+        it('can ensure subscribe on types have valid operations', function() {
+            return p.then(function() {
+                return v.subscribe('types', 'foo', 'dummyOp2', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation must be "insert", "update" or "delete"');
+                    });
+            });
+        });
         it('can detect an invalid session on upload', function() {
             n.get('/api/v1/_status').reply(401);
 
