@@ -13,7 +13,7 @@ model.
 ### Resources
 
 Each of the SDK API methods corresponds to a specific REST API operation on a specific resource.  For example,
-`select` performs a query against a given resource.  `select('types', ...)` queries against defined data types.
+`select` performs a query against a given resource.  `select('system.types', ...)` queries against defined data types.
 `select('procedures', ...)` queries against defined procedures.
 
 The available system resources are listed in `Vantiq.SYSTEM_RESOURCES` and include the following:
@@ -175,14 +175,14 @@ records.  Upon any failure, the promise is rejected with an [error](#error).
 
 Select the `name` property for all available types.
 
-    vantiq.select('types', [ 'name' ])
+    vantiq.select('system.types', [ 'name' ])
         .then((result) => {
             result.forEach(e => console.log(e.name);
         });
 
 Selects all properties filtering to only return types with the `TestType` name.
 
-    vantiq.select('types', [], { name: 'TestType' })
+    vantiq.select('system.types', [], { name: 'TestType' })
         .then((result) => {
             console.log(JSON.stringify(result[0], null, 2));
         });
@@ -220,7 +220,7 @@ promise is rejected with an [error](#error).
 
 Select the `TestType` definition from the `types` resource.
 
-    vantiq.selectOne('types', 'TestType')
+    vantiq.selectOne('system.types', 'TestType')
         .then((result) => {
             console.log(JSON.stringify(result, null, 2));
         });
@@ -443,7 +443,7 @@ or `false` if no record was found.  Upon any failure, the promise is rejected wi
 
 Removes the `TestType` definition from the `types` resource.
 
-    vantiq.deleteOne('types', 'TestType')
+    vantiq.deleteOne('system.types', 'TestType')
         .then((result) => {
             if(result) {
                 console.log("Delete succeeded.");
