@@ -686,7 +686,7 @@ Create a subscription to the `MyDataType` type for that prints out when that typ
         .then(() => {
             console.log("Subscription succeeded.");
         });
-
+See [Vantiq.acknowledge](#vantiq-acknowledge) section for how to make a persistent subscription to a reliable resource
 ## <a id="vantiq-unsubscribeAll"></a> Vantiq.unsubscribeAll
 
 The `unsubscribeAll` method removes all active subscriptions to the Vantiq server by
@@ -859,11 +859,9 @@ void vantiq.acknowledge(subscriptionName, requestId, msg)
 ### Parameters
 Name | Type | Required | Description
 :--: | :--: |:--: | -----------
-subscriptionName | String | Yes | The name of the subscription that uniquely identifies the persistent subscription.
-This was returned by the server on creation of the persistent subscription. 
+subscriptionName | String | Yes | The name of the subscription that uniquely identifies the persistent subscription. This was returned by the server on creation of the persistent subscription. 
 
-requestId | String | Yes |  The id of the requestId that that uniquely identifies the websocket requests made by this subscription.
-This was returned by the server on creation of the persistent subscription. 
+requestId | String | Yes |  The id of the requestId that that uniquely identifies the websocket requests made by this subscription. This was returned by the server on creation of the persistent subscription. 
 
 msg | Object | Yes |   The message in the event being acknowledged. This is the body of the SubscriptionMessage
   
