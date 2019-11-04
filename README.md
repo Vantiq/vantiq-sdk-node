@@ -36,7 +36,7 @@ The `<username>` and `password` are the same credentials used to log into the sy
 
 Now, you are able to perform any SDK calls to the Vantiq server.  For example, the following prints out the list of types that have been defined:
 
-    var promise = vantiq.select('types');
+    var promise = vantiq.select('system.types');
     promise.then((resultSet) => {
         resultSet.each(entry => console.log(entry));
     });
