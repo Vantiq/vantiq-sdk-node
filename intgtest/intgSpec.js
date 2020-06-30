@@ -272,10 +272,10 @@ describe('Vantiq SDK Integration Tests', function() {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
                 // takes some time to execute the rule, so we need
-                // to give it some time.  Adding 2 seconds, in case
+                // to give it some time.  Adding 1.5 seconds, in case
                 // it restarted and needs to generate the rule.
                 return new Promise((resolve, reject) => {
-                    setTimeout(() => resolve(), 1000);
+                    setTimeout(() => resolve(), 1500);
                 })
                 .then(() => {
                     return v.select('TestType', [], { id: id });
