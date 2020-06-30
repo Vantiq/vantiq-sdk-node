@@ -272,9 +272,10 @@ describe('Vantiq SDK Integration Tests', function() {
                 // Rule should insert the record into a TestType
                 // so select it to find the record.  However, this
                 // takes some time to execute the rule, so we need
-                // to give it some time.  Adding 50ms.
+                // to give it some time.  Adding 2 seconds, in case
+                // it restarted and needs to generate the rule.
                 return new Promise((resolve, reject) => {
-                    setTimeout(() => resolve(), 50);
+                    setTimeout(() => resolve(), 1000);
                 })
                 .then(() => {
                     return v.select('TestType', [], { id: id });
@@ -298,19 +299,23 @@ describe('Vantiq SDK Integration Tests', function() {
 
     it('can subscribe to a publish event', function() {
         var resp = null;
-        return v.subscribe('topics', '/test/topic', (r) => {
-            resp = r;
+        return v.subscribe('topics', '/test/sub/topic', (r) => {
+            if (r && r.status == 100) {
+                resp = r;
+            }
         }).
         then(function() {
-            return v.publish('topics', '/test/topic', { foo: 'bar' });
+            // Delay a bit to allow for setup of the subscription
+            var promise = new Promise((resolve) => setTimeout(resolve, 100));
+            return promise.then(() => {v.publish('topics', '/test/sub/topic', { foo: 'bar' })});
         })
         .then(function() {
             // Delay a bit to allow for event processing
             return new Promise((resolve) => setTimeout(resolve, 500));
         })
         .then(function() {
-            should.exist(resp);
-            resp.headers['X-Request-Id'].should.equal('/topics/test/topic');
+            should.exist(resp, "Topic event not received");
+            resp.headers['X-Request-Id'].should.equal('/topics/test/sub/topic');
             resp.body.value.foo.should.equal('bar');
         });
     });
@@ -325,7 +330,7 @@ describe('Vantiq SDK Integration Tests', function() {
         })
         .then(function() {
             // Delay until we can get a response
-            return new Promise((resolve) => setTimeout(resolve, 5000));
+            return new Promise((resolve) => setTimeout(resolve, 6000));
         })
         .then(function() {
             should.exist(resp);
@@ -349,7 +354,8 @@ describe('Vantiq SDK Integration Tests', function() {
                 k: 42,
                 o: { a:1, b:2 }
             };
-            return v.insert('TestType', record);
+            // Delay a bit to allow for setup of the subscription
+            return new Promise((resolve) => setTimeout(resolve, 100)).then(() => {v.insert('TestType', record);})
         })
         .then(function() {
             // Delay a bit to allow for event processing
@@ -499,11 +505,12 @@ describe('Vantiq SDK Integration Tests', function() {
         };
         var numMessages = 0;
         return v.insert('system.topics', topic)
-            .then((result) => {
-                // Find the nearly inserted reliable topic
-                return v.select('system.topics', [], {name: "/reliableTopic"}).then((result) => {
+            .then((res) => {
+                // Find the newly inserted reliable topic
+                return new Promise((resolve) => setTimeout(resolve, 1000))
+                .then(() => v.select('system.topics', [], {name: "/reliableTopic"})).then((result) => {
                     // Ensure record was inserted
-                    result.length.should.equal(1)
+                    result.length.should.equal(1, "Topic not found")
                     //Create a persistent subscription to the reliableTopic
                 }).then( v.subscribe('topics', '/reliableTopic',  {persistent: true}, (r) => {
                     resp = r;
@@ -520,7 +527,7 @@ describe('Vantiq SDK Integration Tests', function() {
                 // Select ArsSubscription to ensure the persistent subscription was made
                     return v.select('ArsSubscription', [], {name: subscriptionName}).then((result) => {
                         // Ensure record was inserted
-                        result.length.should.equal(1)
+                        result.length.should.equal(1, "No subscription found")
                     })
                     }).then(function() {
                         //Publish to reliable topic
@@ -639,13 +646,13 @@ describe('Vantiq SDK Integration Tests', function() {
                         .then((result) => {
                             // Ensure record was inserted
                             
-                            result.length.should.equal(1)
+                            result.length.should.gte(1)
                         });
                 };
                 return new Promise(function(resolve, reject) {
                     setTimeout(function() {
                         resolve(checkForAck());
-                    }, 20000);
+                    }, 5000);
                 });
             });
         });

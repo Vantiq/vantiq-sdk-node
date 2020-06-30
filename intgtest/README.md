@@ -32,5 +32,5 @@ command line:
 
     % env SERVER=<VantiqServerUrl> AUTHTOKEN=<VantiqAccessToken> mocha intgSpec.js --exit
 
-*   **NOTE:** If an error occurs such as: `"env: mocha: No such file or directory"`, simply place
-    `` `npm bin`/ `` before `mocha`.
+*   **NOTE:** If an error occurs such as: `"env: mocha: No such file or directory"`, use
+    `` `npm bin`/mocha `` instead of `mocha`.
