@@ -44,6 +44,10 @@ describe('Vantiq SDK Integration Tests', function() {
         return v.session.accessToken = AUTHTOKEN;
     });
 
+    after(function() {
+        v.unsubscribeAll()
+    });
+
     it('can select data with no constraints', function() {
         return v.select('system.types')
             .then((result) => {

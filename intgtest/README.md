@@ -30,7 +30,7 @@ in `~/.vantiq/profile`.
 Once the project has been loaded, the integration tests can be run using the
 command line:
 
-    % env SERVER=<VantiqServerUrl> AUTHTOKEN=<VantiqAccessToken> mocha intgSpec.js --exit
+    % env SERVER=<VantiqServerUrl> AUTHTOKEN=<VantiqAccessToken> mocha intgSpec.js
 
 *   **NOTE:** If an error occurs such as: `"env: mocha: No such file or directory"`, use
     `` `npm bin`/mocha `` instead of `mocha`.
