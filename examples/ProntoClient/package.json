@@ -16,6 +16,6 @@
     "http": "0.0.0",
     "socket.io": "^2.1.1",
     "uuid": "^3.3.2",
-    "vantiq-sdk": "^1.1.0"
+    "vantiq-sdk": "^1.1.3"
   }
 }
