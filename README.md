@@ -52,4 +52,4 @@ For examples of working applications that use the SDK, see the [examples folder]
 
 ## Copyright and License
 
-Copyright &copy; 2016 Vantiq, Inc.  Code released under the [MIT license](./LICENSE).
+Copyright &copy; 2022 Vantiq, Inc.  Code released under the [MIT license](./LICENSE).
