@@ -350,6 +350,18 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can perform a publish on service', function() {
+            n.post('/api/v1/resources/services/foo')
+                .reply(200);
+
+            return p.then(function() {
+                return v.publish('services', 'foo', { a: 1 })
+                    .then((result) => {
+                        result.should.equal(true);
+                    });
+            });
+        });
+
         it('can not perform publish on other types', function() {
             return p.then(function() {
                 return v.publish('types', 'foo', { a: 1 })
