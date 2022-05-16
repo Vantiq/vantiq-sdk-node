@@ -354,7 +354,7 @@ describe('Vantiq API', function() {
             return p.then(function() {
                 return v.publish('types', 'foo', { a: 1 })
                     .catch((err) => {
-                        err.message.should.equal('Only "sources" and "topics" support publish');
+                        err.message.should.equal("Only 'sources', 'services' and 'topics' support publish");
                     });
             });
         });
