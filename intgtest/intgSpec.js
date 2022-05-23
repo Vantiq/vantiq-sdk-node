@@ -344,6 +344,25 @@ describe('Vantiq SDK Integration Tests', function() {
         });
     });
 
+    it('can subscribe to a service event', function() {
+        this.timeout(10000);
+
+        var resp = null;
+        return v.subscribe('services', 'testService/testEvent', (r) => {
+            resp = r;
+        })
+            .then(function() {
+                // Delay until we can get a response
+                return new Promise((resolve) => setTimeout(resolve, 6000));
+            })
+            .then(function() {
+                should.exist(resp);
+                resp.headers['X-Request-Id'].should.equal('/services/testService/testEvent');
+                resp.body.topic.should.equal('/topics//testService/testEvent');
+                resp.body.name.length.should.equal(36);
+            });
+    });
+
     it('can subscribe to a type event', function() {
         var resp;
         return v.subscribe('types', 'TestType', 'insert', (r) => {
