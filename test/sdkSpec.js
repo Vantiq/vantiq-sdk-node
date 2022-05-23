@@ -447,6 +447,15 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can ensure subscribe on services do not have operations', function() {
+            return p.then(function() {
+                return v.subscribe('services', 'foo', 'dummyop', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation only supported for "types"');
+                    });
+            });
+        });
+
         it('can ensure subscribe on types have operations', function() {
             return p.then(function() {
                 return v.subscribe('types', 'foo', () => {})
