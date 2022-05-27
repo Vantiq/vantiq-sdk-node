@@ -48,14 +48,14 @@ describe('Vantiq SDK Integration Tests', function() {
         v.unsubscribeAll()
     });
 
-    xit('can select data with no constraints', function() {
+    it('can select data with no constraints', function() {
         return v.select('system.types')
             .then((result) => {
                 result.should.include.one.with.property('name', 'TestType');
             });
     });
 
-    xit('can select data with constraints', function() {
+    it('can select data with constraints', function() {
         return v.select('system.types', [ '_id', 'name' ], { name: 'TestType' })
             .then((result) => {
                 result.length.should.equal(1);
@@ -63,21 +63,21 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can select data with sorting', function() {
+    it('can select data with sorting', function() {
         return v.select('system.types', [ '_id', 'name' ], {}, { name: -1 })
             .then((result) => {
                 result[0].name.localeCompare(result[result.length-1].name).should.equal(1);
             });
     });
 
-    xit('can selectOne', function() {
+    it('can selectOne', function() {
         return v.selectOne('system.types', 'TestType')
             .then((result) => {
                 result.should.have.property('name', 'TestType');
             });
     });
 
-    xit('can count data with no constraints', function() {
+    it('can count data with no constraints', function() {
         var count = 0;
         // Select types
         return v.select('system.types', [ '_id' ])
@@ -92,14 +92,14 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can count data with constraints', function() {
+    it('can count data with constraints', function() {
         return v.count('system.types', { name: 'TestType' })
             .then((result) => {
                 result.should.equal(1);
             });
     });
 
-    xit('can insert and update a record', function() {
+    it('can insert and update a record', function() {
         var id = 'IU-' + (new Date()).getTime().toString();
         var record = {
             id: id,
@@ -137,7 +137,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can upsert a record (insert) then upsert (update) a record', function() {
+    it('can upsert a record (insert) then upsert (update) a record', function() {
         var id = 'UP-' + (new Date()).getTime().toString();
         var record = {
             id: id,
@@ -176,7 +176,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can delete a record', function() {
+    it('can delete a record', function() {
         var id = 'DL-' + (new Date()).getTime().toString();
         var record = {
             id: id,
@@ -216,7 +216,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can deleteOne a record', function() {
+    it('can deleteOne a record', function() {
         var id = 'DLONE-' + (new Date()).getTime().toString();
         var record = {
             id: id,
@@ -260,7 +260,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can publish to a topic', function() {
+    it('can publish to a topic', function() {
         var id = 'PB-' + (new Date()).getTime().toString();
         var message = {
             id: id,
@@ -293,7 +293,7 @@ describe('Vantiq SDK Integration Tests', function() {
 
     });
 
-    xit('can execute a procedure', function() {
+    it('can execute a procedure', function() {
         return v.execute('echo', { arg1: 3.14159, arg2: 'xxx' })
             .then((result) => {
                 result.should.have.property('arg1', 3.14159);
@@ -301,7 +301,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can subscribe to a publish event', function() {
+    it('can subscribe to a publish event', function() {
         var resp = null;
         return v.subscribe('topics', '/test/sub/topic', (r) => {
             if (r && r.status == 100) {
@@ -325,7 +325,7 @@ describe('Vantiq SDK Integration Tests', function() {
     });
 
     // Run this test only when the JSONPlaceholder source is loaded and active
-    xit('can subscribe to a source event', function() {
+    it('can subscribe to a source event', function() {
         this.timeout(10000);
 
         var resp = null;
@@ -376,7 +376,7 @@ describe('Vantiq SDK Integration Tests', function() {
         })
     });
 
-    xit('can subscribe to a type event', function() {
+    it('can subscribe to a type event', function() {
         var resp;
         return v.subscribe('types', 'TestType', 'insert', (r) => {
             resp = r;
@@ -404,7 +404,7 @@ describe('Vantiq SDK Integration Tests', function() {
         });
     });
 
-    xit('can upload and download a file', function() {
+    it('can upload and download a file', function() {
         var testPath = path.dirname(this.test.file) + '/../test/resources/testFile.txt';
         var testFile = path.basename(testPath);
         var testDocPath = 'assets/' + testFile;
@@ -445,7 +445,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can upload and download a jpeg image', function() {
+    it('can upload and download a jpeg image', function() {
         var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.jpg';
         var testFile = path.basename(testPath);
         var testDocPath = 'assets/' + testFile;
@@ -473,7 +473,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can upload and download a png image', function() {
+    it('can upload and download a png image', function() {
         var testPath = path.dirname(this.test.file) + '/../test/resources/testImage.png';
         var testFile = path.basename(testPath);
         var testDocPath = 'assets/' + testFile;
@@ -501,7 +501,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can upload and download a video', function() {
+    it('can upload and download a video', function() {
         var testPath = path.dirname(this.test.file) + '/../test/resources/testVideo.mp4';
         var testFile = path.basename(testPath);
         var testDocPath = 'assets/' + testFile;
@@ -529,7 +529,7 @@ describe('Vantiq SDK Integration Tests', function() {
             });
     });
 
-    xit('can subscribe to a reliable topic event', function() {
+    it('can subscribe to a reliable topic event', function() {
         var resp = null;
         var subscriptionName = null;
         var topic = {
@@ -624,7 +624,7 @@ describe('Vantiq SDK Integration Tests', function() {
         });
     });
 
-    xit('acknowledge a reliable message', function() {
+    it('acknowledge a reliable message', function() {
         var resp = null;
         var subscriptionName = null;
         var topic = {
