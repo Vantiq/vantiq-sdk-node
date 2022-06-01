@@ -347,33 +347,34 @@ describe('Vantiq SDK Integration Tests', function() {
     it('can subscribe to a service event', function() {
         var resp = null;
         var subscriptionName = null;
+        // Subscribe to the outbound service event
         return v.subscribe('services', '/testService/testEvent',  {persistent: true}, (r) => {
             resp = r;
+            resp.headers['X-Request-Id'].should.equal('/services//testService/testEvent');
             if (r.body.subscriptionName !== undefined) {
                 subscriptionName = r.body.subscriptionName;
             }
         }).then(function() {
-            //Publish to service event
-            return v.publish('topics', '/topics//testService/testEvent', { foo: 'bar' });
+            //Publish to the inbound service event
+            return v.publish('services', 'testService/inboundHandler', { foo: 'bar' });
         }).then(function() {
             // Delay a bit to allow for event processing
             return new Promise((resolve) => setTimeout(resolve, 500));
         }).then(function() {
             should.exist(resp);
-                //Ensure receipt of event
-                resp.headers['X-Request-Id'].should.equal('/services//testService/testEvent');
-            }).then(function() {
-            // Delay a bit to allow for event processing
+            //Ensure receipt of event
+            resp.headers['X-Request-Id'].should.equal('/services//testService/testEvent');
+        }).then(function() {
+        // Delay a bit to allow for event processing
             return new Promise((resolve) => setTimeout(resolve, 2000));
-        })
-            .then(function() {
-                //Ensure we get the event redelivered
-                should.exist(resp);
-                resp.headers['X-Request-Id'].should.equal('/services//testService/testEvent');
-            }).then(function() {
+        }).then(function() {
+            //Ensure we get the event redelivered
+            should.exist(resp);
+            resp.headers['X-Request-Id'].should.equal('/services//testService/testEvent');
+        }).then(function() {
             //Close the connection
             v.unsubscribeAll();
-        })
+        });
     });
 
     it('can subscribe to a type event', function() {

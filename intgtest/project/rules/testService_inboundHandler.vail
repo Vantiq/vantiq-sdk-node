@@ -1,0 +1,3 @@
+RULE testService_inboundHandler
+WHEN EVENT OCCURS ON "/topics/testService/inboundHandler/handler/inbound" AS event
+PUBLISH event to SERVICE EVENT "testService/testEvent"

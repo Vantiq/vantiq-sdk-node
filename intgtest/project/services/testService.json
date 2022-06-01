@@ -1,16 +1,25 @@
 {
   "active" : true,
   "ars_relationships" : [ ],
+  "description" : null,
   "eventTypes" : {
-    "inboundTestEvent": {
-      "direction": "INBOUND",
-      "implementingEventPath": "/topics//test/topic"
+    "inboundHandler" : {
+      "direction" : "INBOUND",
+      "implementingResource" : "/rules/testService_inboundHandler"
     },
     "testEvent" : {
       "direction" : "OUTBOUND",
-      "implementingEventPath" : "/topics//testService/testEvent"
+      "implementingEventPath" : "/topics//testService/testEvent",
+      "isReliable" : false
     }
   },
+  "globalType" : null,
+  "interface" : [ {
+    "name" : "publishToOutbound",
+    "parameters" : [ ]
+  } ],
   "name" : "testService",
-  "replicationFactor" : 1
+  "partitionedType" : null,
+  "replicationFactor" : 1,
+  "scheduledProcedures" : { }
 }
