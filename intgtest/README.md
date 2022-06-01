@@ -17,10 +17,7 @@ to load the artifacts into the server:
 
 The following CLI commands will load these into the Vantiq server:
 
-    % vantiq -s <profile> load type      ./type/TestType.json
-    % vantiq -s <profile> load ruleset   ./rule/onTestPublish.vail
-    % vantiq -s <profile> load procedure ./procedure/echo.vail
-    % vantiq -s <profile> load source    ./sources/JSONPlaceholder.json
+    % vantiq -s <profile> import -d  ./project
 
 Note that `<profile>` specifies the proper server and credentials to use
 in `~/.vantiq/profile`.

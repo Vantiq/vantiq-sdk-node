@@ -350,11 +350,23 @@ describe('Vantiq API', function() {
             });
         });
 
+        it('can perform a publish on service', function() {
+            n.post('/api/v1/resources/services/foo')
+                .reply(200);
+
+            return p.then(function() {
+                return v.publish('services', 'foo', { a: 1 })
+                    .then((result) => {
+                        result.should.equal(true);
+                    });
+            });
+        });
+
         it('can not perform publish on other types', function() {
             return p.then(function() {
                 return v.publish('types', 'foo', { a: 1 })
                     .catch((err) => {
-                        err.message.should.equal('Only "sources" and "topics" support publish');
+                        err.message.should.equal("Only 'sources', 'services' and 'topics' support publish");
                     });
             });
         });
@@ -429,6 +441,15 @@ describe('Vantiq API', function() {
         it('can ensure subscribe on topics do not have operations', function() {
             return p.then(function() {
                 return v.subscribe('topics', 'foo', 'dummyop', () => {})
+                    .catch((err) => {
+                        err.message.should.equal('Operation only supported for "types"');
+                    });
+            });
+        });
+
+        it('can ensure subscribe on services do not have operations', function() {
+            return p.then(function() {
+                return v.subscribe('services', 'foo', 'dummyop', () => {})
                     .catch((err) => {
                         err.message.should.equal('Operation only supported for "types"');
                     });
