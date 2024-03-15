@@ -21,7 +21,7 @@ The first step is to create an instance of the Vantiq SDK providing the URL of t
     var Vantiq = require('vantiq-sdk');
     
     var vantiq = new Vantiq({ 
-        server:     'https://dev.vantiq.com',
+        server:     '<server>',
         apiVersion: 1
     });
 
@@ -29,13 +29,13 @@ where `<server>` is the full URL for the Vantiq server to connect to, such as *h
 
 If you have an access token for your Vantiq server, just set `vantiq.accessToken` to the token's value:
 
-    vantiq.accessToken = "<token value>";
+    vantiq.accessToken = '<token value>';
 
 Once you have done that, you are able to perform SDK calls like the `select()` shown below.
 
 To establish a connection to the server using a username and password, use the `authenticate` method:
 
-    var promise = vantiq.authenticate(<username>, <password>);
+    var promise = vantiq.authenticate('<username>', '<password>');
     promise.then((result) => {
         console.log('Connected!');
     });
