@@ -25,7 +25,7 @@ The first step is to create an instance of the Vantiq SDK providing the URL of t
         apiVersion: 1
     });
 
-where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.
+where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.
 
 If you have an access token for your Vantiq server, just set `vantiq.accessToken` to the token's value:
 
