@@ -40,7 +40,7 @@ To establish a connection to the server using a username and password, use the `
         console.log('Connected!');
     });
 
-The `username` and `password` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-memory an access token that subsequent API calls will use.  
+The `<username>` and `<password>` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-memory an access token that subsequent API calls will use.  
 
 Now, you are able to perform any SDK calls to the Vantiq server.  For example, the following prints out the list of types that have been defined:
 
