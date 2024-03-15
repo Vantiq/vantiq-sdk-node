@@ -14,7 +14,7 @@ The SDK is available as an [NPM](https://www.npmjs.com/) module.  To install, us
 
 ## Quick Start
 
-You will need valid credentials on a Vantiq server in the form of a username and password.  If you have a private Vantiq server, contact your administrator for credentials.  If you wish to use the Vantiq public cloud, you will need to create an accessToken and set `vantiq.accessToken` to that token's value.
+You will need valid credentials on a Vantiq server.  This can be in the form of a username and password OR an accessToken created in the Modelo UI for the server (under Administer menu -> Advanced -> Access Token).  An accessToken is required for use with a cloud server or OAuth-enabled server.  An accessToken OR the username/password option will work with a local or edge Vantiq server.
 
 The first step is to create an instance of the Vantiq SDK providing the URL of the Vantiq server to connect:
 
@@ -25,14 +25,22 @@ The first step is to create an instance of the Vantiq SDK providing the URL of t
         apiVersion: 1
     });
 
-where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.  To establish a connection to the server using a username and password, use the `authenticate` method:
+where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.
+
+If you have an accessToken for your Vantiq server, just set `vantiq.accessToken` to the token's value:
+
+    vantiq.accessToken = "<token value>";
+
+Once you have done that, you are able to perform SDK calls like the `select()` shown below.
+
+To establish a connection to the server using a username and password, use the `authenticate` method:
 
     var promise = vantiq.authenticate(<username>, <password>);
     promise.then((result) => {
         console.log('Connected!');
     });
 
-The `username` and `password` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-memory an access token that subsequent API calls will use.  If you have an accessToken already (e.g. for a public cloud), just set `vantiq.accessToken` to the token and skip the `authenticate()` call.
+The `username` and `password` are the same credentials used to log into the system.  Note the username and password are not stored either in-memory or persistently after this authentication call.  After successfully authenticating with the system, the *Vantiq* instance stores in-memory an access token that subsequent API calls will use.  
 
 Now, you are able to perform any SDK calls to the Vantiq server.  For example, the following prints out the list of types that have been defined:
 
