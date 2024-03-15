@@ -14,7 +14,7 @@ The SDK is available as an [NPM](https://www.npmjs.com/) module.  To install, us
 
 ## Quick Start
 
-You will need valid credentials on a Vantiq server.  This can be in the form of a username and password OR an accessToken created in the Modelo UI for the server (under Administer menu -> Advanced -> Access Token).  An accessToken is required for use with a cloud server or OAuth-enabled server.  An accessToken OR the username/password option will work with a local or edge Vantiq server.
+You will need valid credentials on a Vantiq server.  This can be in the form of a username and password OR an access token created in the Modelo UI for the server (under Administer menu -> Advanced -> Access Tokens).  An access token is required for use with a cloud server or OAuth-enabled server.  An access token OR the username/password option will work with a local or edge Vantiq server.
 
 The first step is to create an instance of the Vantiq SDK providing the URL of the Vantiq server to connect:
 
@@ -27,7 +27,7 @@ The first step is to create an instance of the Vantiq SDK providing the URL of t
 
 where `<server>` is the full URL for the Vantiq server to connect to, such as *https://dev.vantiq.com/* and `apiVersion` is the version of the API to use.  If not specified, this defaults to the latest version, currently *1*.  At this point, the *Vantiq* instance has not yet connected to the server.
 
-If you have an accessToken for your Vantiq server, just set `vantiq.accessToken` to the token's value:
+If you have an access token for your Vantiq server, just set `vantiq.accessToken` to the token's value:
 
     vantiq.accessToken = "<token value>";
 
