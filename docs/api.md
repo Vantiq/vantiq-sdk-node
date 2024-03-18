@@ -20,21 +20,22 @@ The available system resources are listed in `Vantiq.SYSTEM_RESOURCES` and inclu
 
 Resource Name  | Type Name    | Description
 -------------- | ------------ | -----------
-analyticsmodels| ArsAnalyticsModel | Analytical models that can be imported and executed in Vantiq
-configurations | ArsRuleConfiguration | Configurations of Vantiq resources
-documents      | ArsDocument  | Unstructured documents stored in the Vantiq system
-namespaces     | ArsNamespace | Namespaces defined in the Vantiq system
-nodes          | ArsPeerNode  | Node defined in the Vantiq system to support federation
-profiles       | ArsProfile   | Vantiq user permission profiles
-procedures     | ArsComponent | Procedures defined in the Vantiq system
-rules          | ArsRuleSet   | Rules defined in the Vantiq system
-scalars        | ArsScalar    | User-defined property type definitions
-sources        | ArsSource    | Data sources defined in the Vantiq system
-topics         | ArsTopic     | User-defined topics in the Vantiq system
-types          | ArsType      | Data types defined in the Vantiq system
-users          | ArsUser      | Vantiq user accounts
-images         | ArsImages    | Images stored in the Vantiq system
-videos         | ArsVideos    | Videos stored in the Vantiq system
+analyticsmodels| system.analyticsmodels | Analytical models that can be imported and executed in Vantiq
+configurations | system.configurations | Configurations of Vantiq resources
+documents      | system.documents  | Unstructured documents stored in the Vantiq system
+namespaces     | system.namespaces | Namespaces defined in the Vantiq system
+nodes          | system.nodes      | Node defined in the Vantiq system to support federation
+profiles       | system.profiles   | Vantiq user permission profiles
+procedures     | system.procedures | Procedures defined in the Vantiq system
+rules          | system.rules      | Rules defined in the Vantiq system
+scalars        | ArsScalar         | User-defined property type definitions
+services       | system.services   | Services defined in the Vantiq system
+sources        | system.sources    | Data sources defined in the Vantiq system
+topics         | system.topics     | User-defined topics in the Vantiq system
+types          | system.types      | Data types defined in the Vantiq system
+users          | system.users      | Vantiq user accounts
+images         | system.images     | Images stored in the Vantiq system
+videos         | system.videos     | Videos stored in the Vantiq system
 
 Data types defined in the Vantiq system can also be used as resources.  For example, if you define data
 type `MyNewType`, then `MyNewType` is now a legal resource name that can be used in the API methods.
@@ -42,24 +43,24 @@ type `MyNewType`, then `MyNewType` is now a legal resource name that can be used
 ### API
 
 * [Vantiq](#vantiq)
-* [Vantiq.authenticate](#vantiq-authenticate)
-* [Vantiq.accessToken](#vantiq-accessToken)
-* [Vantiq.select](#vantiq-select)
-* [Vantiq.selectOne](#vantiq-selectOne)
-* [Vantiq.count](#vantiq-count)
-* [Vantiq.insert](#vantiq-insert)
-* [Vantiq.update](#vantiq-update)
-* [Vantiq.upsert](#vantiq-upsert)
-* [Vantiq.delete](#vantiq-delete)
-* [Vantiq.deleteOne](#vantiq-deleteOne)
-* [Vantiq.publish](#vantiq-publish)
-* [Vantiq.execute](#vantiq-execute)
-* [Vantiq.query](#vantiq-query)
-* [Vantiq.subscribe](#vantiq-subscribe)
-* [Vantiq.upload](#vantiq-upload)
-* [Vantiq.download](#vantiq-download)
-* [Vantiq.unsubscribeAll](#vantiq-unsubscribeAll)
-* [Vantiq.acknowledge](#vantiq-acknowledge)
+* [Vantiq.authenticate](#-vantiqauthenticate)
+* [Vantiq.accessToken](#-vantiqaccesstoken)
+* [Vantiq.select](#-vantiqselect)
+* [Vantiq.selectOne](#-vantiqselectone)
+* [Vantiq.count](#-vantiqcount)
+* [Vantiq.insert](#-vantiqinsert)
+* [Vantiq.update](#-vantiqupdate)
+* [Vantiq.upsert](#-vantiqupsert)
+* [Vantiq.delete](#-vantiqdelete)
+* [Vantiq.deleteOne](#-vantiqdeleteone)
+* [Vantiq.publish](#-vantiqpublish)
+* [Vantiq.execute](#-vantiqexecute)
+* [Vantiq.query](#-vantiqquery)
+* [Vantiq.subscribe](#-vantiqsubscribe)
+* [Vantiq.upload](#-vantiqupload)
+* [Vantiq.download](#-vantiqdownload)
+* [Vantiq.unsubscribeAll](#-vantiqunsubscribeall)
+* [Vantiq.acknowledge](#-vantiqacknowledge)
 
 ### Error
 
