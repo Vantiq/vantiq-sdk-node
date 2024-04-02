@@ -482,7 +482,7 @@ publish operation on the source.
 
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
-resource | String | Yes | The resource to publish.  Must be 'service', 'topics', or 'sources'.
+resource | String | Yes | The resource to publish.  Must be 'services', 'topics', or 'sources'.
 id       | String | Yes | The id for the specific resource to use.  An example topic is '/test/topic'.  An example source is 'mqttChannel'. An example service event type is '/testService/inboundTestEvent' (the service and event name in the form '<serviceName>/<eventName>').
 payload  | Object | Yes | For topics, the payload is the message to send.  For sources, this is the parameters for the source.
 
@@ -624,7 +624,7 @@ callback is executed whenever a matching event occurs.
 Name | Type | Required | Description
 :--: | :--: | :------:| -----------
 resource | String | Yes | The resource event to subscribe.  Must be one of 'services' or 'topics' or 'sources' or 'types'.
-name     | String | Yes | The resource name that identifies the specific resource event.  For services, this is the service and event name in the form '<serviceName>/<eventName>' (e.g. '/testServices/testEvent'). For topics, this is the topic name (e.g. '/my/topic/').  For sources, this is the source name.  For types, this is the data type name.
+name     | String | Yes | The resource name that identifies the specific resource event.  For services, this is the service and event name in the form '<serviceName>/<eventName>' (e.g. '/testService/testEvent'). For topics, this is the topic name (e.g. '/my/topic/').  For sources, this is the source name.  For types, this is the data type name.
 operation| String | No  | This only applies for 'types' and specifies the operation to listen to (e.g. 'insert', 'update', or 'delete')
 callback | Function| Yes | This is the callback that executes whenever a matching event occurs.  The signiature is: `callback(message)`.
 params   | Map | No | Map specifying extra details about the subscription to the server. (eg: {persistent:true} to create a persistent subscription, {persistent:true: subscriptionName: 'mySub', requestId: requestId} to reconnect to a broken persistent subscription)
