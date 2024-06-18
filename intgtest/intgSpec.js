@@ -315,7 +315,7 @@ describe('Vantiq SDK Integration Tests', function() {
         })
         .then(function() {
             // Delay a bit to allow for event processing
-            return new Promise((resolve) => setTimeout(resolve, 500));
+            return new Promise((resolve) => setTimeout(resolve, 650));
         })
         .then(function() {
             should.exist(resp, "Topic event not received");

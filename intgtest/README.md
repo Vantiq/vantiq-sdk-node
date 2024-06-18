@@ -14,6 +14,7 @@ to load the artifacts into the server:
 * `rules/onTestPublish.vail`: A rule that persists an TestType record when an event is fired on `/test/topic`
 * `procedures/echo.vail`: A procedure that simply echos the input arguments
 * `sources/JSONPlaceholder.json`: A source used for testing
+* `services/testService.json`: A service and event type used for testing
 
 The following CLI commands will load these into the Vantiq server:
 
