@@ -34,8 +34,6 @@ sources        | system.sources    | Data sources defined in the Vantiq system
 topics         | system.topics     | User-defined topics in the Vantiq system
 types          | system.types      | Data types defined in the Vantiq system
 users          | system.users      | Vantiq user accounts
-images         | system.images     | Images stored in the Vantiq system
-videos         | system.videos     | Videos stored in the Vantiq system
 
 Data types defined in the Vantiq system can also be used as resources.  For example, if you define data
 type `MyNewType`, then `MyNewType` is now a legal resource name that can be used in the API methods.
@@ -725,7 +723,7 @@ Name | Type | Required | Description
 file | File | Yes | The full path to the file to be uploaded
 contentType | String | Yes | The MIME type of the uploaded file (e.g. "image/jpeg")
 String | documentPath | Yes | The "path" of the ArsDocument in Vantiq (e.g. "assets/myDocument.txt")
-String | resourcePath | No | The "path" of the Vantiq resource that the file will be uploaded to (e.g. "/resources/documents", "/resources/images/", or "/resources/videos")
+String | resourcePath | No | The "path" of the Vantiq resource that the file will be uploaded to (e.g. "/resources/documents")
 
 ### Returns
 
@@ -744,14 +742,6 @@ The following uploads a text file and prints out the resulting `ArsDocument`:
 
     var file = '/path/to/file/myFile.txt';
     vantiq.upload(file, 'text/plain', 'assets/myFile.txt')
-        .then((result) => {
-            console.log(JSON.stringify(result, null, 2));
-        });
-        
-The following example uploads an image and prints out the resulting `ArsImage`:
-    
-    var file = '/path/to/file/myImage.png';
-    vantiq.upload(file, 'image/png', 'assets/myImage.png', '/resources/images')
         .then((result) => {
             console.log(JSON.stringify(result, null, 2));
         });
